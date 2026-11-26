@@ -10,14 +10,14 @@
     {
       "id": "demo_001",
       "enabled": false,
-      "title": "TEKVIYO Cloud Automation Demo",
+      "title": "TEKVIYO 4-Scene Production Showcase",
       "caption": "TEKVIYO تبني لك أنظمة أتمتة ذكية تعمل 24/7 في السحابة بدون تدخل يدوي. #TEKVIYO #AI #Automation",
       "audio": {
         "voicePath": "audio/demo_001.wav",
         "bgmPath": "audio/bgm.mp3",
         "bgmVolume": 0.14,
         "transitionSfxPath": "sfx/whoosh.mp3",
-        "fallbackSeconds": 4
+        "fallbackSeconds": 6
       },
       "captions": {
         "enabled": true,
@@ -26,50 +26,85 @@
       },
       "scenes": [
         {
-          "type": "hook",
+          "type": "image_text",
           "weight": 1,
-          "badge": "هندسة الأتمتة السحابية",
-          "headline": "وداعاً للعمل اليدوي المتكرر",
-          "subtext": "أنظمة ذكية تدير عملياتك الرقمية بسرعة فائقة"
+          "imagePath": "images/demo_001.jpg",
+          "zoom": "in",
+          "tag": "TEKVIYO | الأتمتة السحابية",
+          "headline": "حوّل عملياتك الرقمية إلى مصنع ذكي",
+          "subtext": "تكامل سحابي متكامل بدون تدخل يدوي"
         },
         {
-          "type": "stat",
+          "type": "whatsapp_chat",
           "weight": 1,
-          "value": 94,
-          "prefix": "+",
-          "suffix": "%",
-          "label": "توفير في وقت التشغيل الأسبوعي",
-          "sublabel": "قياس فعلي على خطوط الإنتاج السحابية"
-        },
-        {
-          "type": "ui_card",
-          "weight": 1,
-          "variant": "saas",
-          "appName": "TEKVIYO Cloud Engine",
-          "timestamp": "مباشر",
-          "headerTitle": "تحديث حالة خط الإنتاج",
-          "items": [
+          "contactName": "TEKVIYO Assistant",
+          "messages": [
             {
-              "title": "مزامنة البيانات عبر السحابة",
-              "status": "مكتمل"
+              "sender": "client",
+              "text": "مرحباً، أحتاج ربط المتجر بنظام أتمتة الطلبات",
+              "time": "10:02"
             },
             {
-              "title": "توليد التقارير والفيديوهات تلقائياً",
-              "status": "نشط"
+              "sender": "bot",
+              "text": "أهلاً بك! تم تجهيز الربط التلقائي وتفعيل التقارير الفورية خلال دقيقتين.",
+              "time": "10:02"
             },
             {
-              "title": "إشعارات فورية لفريق التشغيل",
-              "status": "تم"
+              "sender": "client",
+              "text": "رائع جداً، متى نبدأ التشغيل؟",
+              "time": "10:03"
+            },
+            {
+              "sender": "bot",
+              "text": "النظام جاهز الآن — تم إرسال رابط لوحة التحكم إليك مباشرة.",
+              "time": "10:03"
             }
           ]
         },
         {
-          "type": "cta",
+          "type": "bar_chart",
           "weight": 1,
-          "eyebrow": "TEKVIYO",
-          "headline": "انقل أعمالك إلى الجيل القادم",
-          "subtext": "احجز جلسة تحليل مجانية لعملياتك اليوم",
-          "ctaText": "ابدأ الأتمتة الآن"
+          "title": "مقارنة سرعة إنجاز المهام",
+          "bars": [
+            {
+              "label": "العمل اليدوي التقليدي",
+              "value": 24,
+              "displayValue": "24%"
+            },
+            {
+              "label": "أدوات منفصلة جزئياً",
+              "value": 52,
+              "displayValue": "52%"
+            },
+            {
+              "label": "أتمتة TEKVIYO السحابية",
+              "value": 96,
+              "displayValue": "96%",
+              "highlight": true
+            }
+          ]
+        },
+        {
+          "type": "timeline_steps",
+          "weight": 1,
+          "title": "ثلاث خطوات للتشغيل السحابي",
+          "steps": [
+            {
+              "number": "01",
+              "title": "تحليل سير العمل",
+              "subtitle": "تحديد المهام المتكررة ونقاط الأتمتة عالية الأثر"
+            },
+            {
+              "number": "02",
+              "title": "بناء خط الإنتاج الذكي",
+              "subtitle": "ربط البيانات والإشعارات في السحابة بأعلى أمان"
+            },
+            {
+              "number": "03",
+              "title": "تشغيل مستمر 24/7",
+              "subtitle": "مراقبة لحظية وتوسّع تلقائي مع نمو أعمالك"
+            }
+          ]
         }
       ]
     }

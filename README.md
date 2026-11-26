@@ -23,12 +23,12 @@ video-factory/
 ├── src/
 │   ├── index.ts                  # Remotion entry point
 │   ├── Root.tsx                  # FactoryReel composition (1080x1920 @ 60fps) + calculateMetadata
-│   ├── FactoryVideo.tsx          # Proportional scene scheduler, 0.4s BGM fade-out, transition SFX, progress bar, captions
+│   ├── FactoryVideo.tsx          # Proportional scene scheduler, drifting ambient glow, top watermark, 0.4s BGM fade-out, transition SFX, captions
 │   ├── types.ts                  # Strict TypeScript schemas (SceneItem, ResolvedAssets, etc.)
 │   ├── components/
 │   │   └── CaptionOverlay.tsx    # 3–4 word chunked captions, active-word highlight, RTL-safe
 │   ├── scenes/
-│   │   └── SceneRouter.tsx       # 7 Lego scenes: hook, stat, broll_text, image_text, comparison, ui_card, cta
+│   │   └── SceneRouter.tsx       # 10 Lego scenes: hook, stat, broll_text, image_text, comparison, ui_card, whatsapp_chat, bar_chart, timeline_steps, cta
 │   └── lib/
 │       ├── fonts.ts              # Module-scope Google Fonts (Cairo, Vazirmatn, Inter, JetBrainsMono)
 │       ├── assets.ts             # Forward-slash clientAsset() resolver
@@ -106,6 +106,9 @@ npm run factory -- all --force
 | `image_text` | Ken Burns `<Img>` (`zoom: "in"` 1.0→1.12 or `"out"` 1.12→1.0) + dark readability gradient + RTL text | Styled animated dot-grid canvas when image file is missing |
 | `comparison` | High-contrast Before / After cards stacked for 9:16 mobile | Optional eyebrow & headline |
 | `ui_card` | Clean SaaS or WhatsApp (`variant: "saas" \| "whatsapp"`) notification card | Supports plain strings or `{ title, detail, status }` items |
+| `whatsapp_chat` | Dark mobile chat thread with staggered spring client/bot bubbles | Automated bot replies highlighted in `brand.primary` with `✓✓` status |
+| `bar_chart` | 3–5 animated horizontal bars scaling with spring + tabular readouts | Highlighted key bars in `brand.primary`, safe zero/max scaling |
+| `timeline_steps` | Sequential milestone cards connected by an animated vertical accent line | Staggered entrance with numbered badges and optional subtitles |
 | `cta` | Brand logo + bold closing headline + animated CTA pill | Hides logo gracefully when `logoPath` file is missing |
 
 All RTL brands enforce `direction: "rtl"`, `letterSpacing: "0px"`, and `>= 64px` horizontal padding inside 9:16 mobile safe zones. Audio tracks support smooth **0.4s** BGM end fade-out and optional `audio.transitionSfxPath` (e.g. `sfx/whoosh.mp3`) played softly (`volume: 0.25`) at scene transitions from scene index 1 onward when present.

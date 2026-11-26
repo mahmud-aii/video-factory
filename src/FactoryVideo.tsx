@@ -10,7 +10,7 @@ import {
 import { CaptionOverlay } from './components/CaptionOverlay';
 import { clientAsset } from './lib/assets';
 import { hexToRgba } from './lib/color';
-import { getSafeZones } from './lib/rtl';
+import { formatBidiText, getSafeZones, rtlSafeTextStyle } from './lib/rtl';
 import { computeSceneTimings } from './lib/timing';
 import { SceneRouter } from './scenes/SceneRouter';
 import type { FactoryVideoProps } from './types';
@@ -46,6 +46,22 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
       ? clientAsset(brandSlug, job.audio.transitionSfxPath)
       : '';
 
+  // Subtle ambient radial glow drift so non-video scenes never feel static
+  const elapsedSec = frame / fps;
+  const glowPrimaryX = 20 + Math.sin(elapsedSec * 0.65) * 9;
+  const glowPrimaryY = 16 + Math.cos(elapsedSec * 0.5) * 7;
+  const glowAccentX = 82 + Math.cos(elapsedSec * 0.6) * 9;
+  const glowAccentY = 82 + Math.sin(elapsedSec * 0.48) * 7;
+
+  const isRestrainedAccent =
+    typeof styleRules?.accentMaxUsagePercent === 'number' &&
+    styleRules.accentMaxUsagePercent <= 5;
+  const primaryGlowAlpha = isRestrainedAccent ? 0.06 : 0.16;
+  const accentGlowAlpha = isRestrainedAccent ? 0.04 : 0.11;
+
+  const watermarkText = (brand.handle || brand.name || '').trim();
+  const isWatermarkHandle = watermarkText.startsWith('@');
+
   return (
     <AbsoluteFill
       style={{
@@ -53,15 +69,16 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* Subtle branded ambient backdrop */}
+      {/* Subtle drifting ambient radial glow behind non-video scenes */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(circle at 18% 14%, ${hexToRgba(
-            brand.primary,
-            0.16
-          )} 0%, transparent 48%), radial-gradient(circle at 86% 84%, ${hexToRgba(
+          background: `radial-gradient(circle at ${glowPrimaryX.toFixed(1)}% ${glowPrimaryY.toFixed(
+            1
+          )}%, ${hexToRgba(brand.primary, primaryGlowAlpha)} 0%, transparent 48%), radial-gradient(circle at ${glowAccentX.toFixed(
+            1
+          )}% ${glowAccentY.toFixed(1)}%, ${hexToRgba(
             brand.accent,
-            0.12
+            accentGlowAlpha
           )} 0%, transparent 46%)`,
           pointerEvents: 'none',
         }}
@@ -110,12 +127,45 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
         </Sequence>
       ))}
 
-      {/* Minimal top scene progress indicator */}
+      {/* Subtle low-opacity brand handle watermark in top safe zone */}
+      {watermarkText ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: 90,
+            left: safeZones.horizontal,
+            right: safeZones.horizontal,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            zIndex: 30,
+          }}
+        >
+          <span
+            style={{
+              ...rtlSafeTextStyle(brand, {
+                textAlign: 'center',
+                fontSize: 24,
+                fontWeight: 600,
+                color: hexToRgba(brand.text, 0.34),
+                lineHeight: 1.2,
+              }),
+              direction: isWatermarkHandle ? 'ltr' : brand.dir,
+              unicodeBidi: isWatermarkHandle ? 'isolate' : undefined,
+            }}
+          >
+            {isWatermarkHandle ? watermarkText : formatBidiText(watermarkText, brand.dir)}
+          </span>
+        </div>
+      ) : null}
+
+      {/* Sleek top scene progress indicator */}
       {scheduledScenes.length > 0 ? (
         <div
           style={{
             position: 'absolute',
-            top: 120,
+            top: 136,
             left: safeZones.horizontal,
             right: safeZones.horizontal,
             display: 'flex',
@@ -137,7 +187,7 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
                 key={`progress-${scheduled.index}`}
                 style={{
                   flex: Math.max(0.2, scheduled.scene.weight || 1),
-                  height: 6,
+                  height: 5,
                   borderRadius: 999,
                   backgroundColor: hexToRgba(brand.text, 0.16),
                   overflow: 'hidden',

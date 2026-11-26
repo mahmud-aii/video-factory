@@ -1,5 +1,8 @@
 name: Cloud Video Factory
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -28,12 +31,12 @@ jobs:
       has_jobs: ${{ steps.plan.outputs.has_jobs }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Build job matrix
         id: plan
@@ -50,12 +53,12 @@ jobs:
       matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Node dependencies
@@ -137,7 +140,7 @@ jobs:
 
       - name: Setup Python for Faster-Whisper
         if: env.SKIP_VIDEO != 'true' && steps.whisper_check.outputs.should_transcribe == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.11'
 
@@ -166,7 +169,7 @@ jobs:
 
       - name: Upload GitHub Workflow Artifact
         if: env.SKIP_VIDEO != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: video-${{ matrix.slug }}-${{ matrix.videoId }}
           path: output/${{ matrix.slug }}/${{ matrix.videoId }}.*

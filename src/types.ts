@@ -128,6 +128,43 @@ export type UiCardScene = BaseScene & {
   items: Array<string | UiCardItem>;
 };
 
+export type WhatsappChatMessage = {
+  sender: 'client' | 'bot';
+  text: string;
+  time?: string;
+};
+
+export type WhatsappChatScene = BaseScene & {
+  type: 'whatsapp_chat';
+  contactName: string;
+  messages: WhatsappChatMessage[];
+};
+
+export type BarChartDatum = {
+  label: string;
+  value: number;
+  displayValue?: string;
+  highlight?: boolean;
+};
+
+export type BarChartScene = BaseScene & {
+  type: 'bar_chart';
+  title: string;
+  bars: BarChartDatum[];
+};
+
+export type TimelineStepItem = {
+  number: string;
+  title: string;
+  subtitle?: string;
+};
+
+export type TimelineStepsScene = BaseScene & {
+  type: 'timeline_steps';
+  title: string;
+  steps: TimelineStepItem[];
+};
+
 export type CtaScene = BaseScene & {
   type: 'cta';
   eyebrow?: string;
@@ -144,6 +181,9 @@ export type SceneItem =
   | ImageTextScene
   | ComparisonScene
   | UiCardScene
+  | WhatsappChatScene
+  | BarChartScene
+  | TimelineStepsScene
   | CtaScene;
 
 export type SceneConfig = SceneItem;

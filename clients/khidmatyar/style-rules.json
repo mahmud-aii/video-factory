@@ -20,9 +20,10 @@
   },
   "accentMaxUsagePercent": 5,
   "visualNotes": [
-    "Brand identity: خدمت يار | KHIDMATYAR (@khidmatyar) — trusted, dignified service identity.",
-    "Color hierarchy: deep emerald (#071A12) primary canvas, warm ivory (#F7F6F2) typography, and restrained gold (#D4AF37) strictly capped at <=5% of total frame area (hairline accents, active caption word, subtle badges/CTA).",
-    "Never flood backgrounds or large surfaces with gold; preserve calm editorial restraint without neon glare.",
+    "Brand identity: خدمت يار | KHIDMATYAR (@khidmatyar) — trusted, dignified, modest visual aesthetic.",
+    "Gold visual budget: restrained gold (#D4AF37) strictly <= 5% of total frame area over deep emerald (#071A12) / surface (#0D291D) and ivory (#F7F6F2) typography.",
+    "No icon rotation: keep all icons, badges, and geometric markers strictly upright and steady (zero spin or tilt animations).",
+    "Modest visuals: calm, respectful, culturally appropriate imagery and restrained motion without flashy neon or cluttered effects.",
     "Typography: Vazirmatn, Cairo, sans-serif with strictly 0px letter-spacing on all RTL Arabic/Persian text."
   ]
 }
