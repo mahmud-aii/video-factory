@@ -1,0 +1,76 @@
+{
+  "settings": {
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "skipExisting": true,
+    "defaultLanguage": "ar"
+  },
+  "videos": [
+    {
+      "id": "demo_001",
+      "enabled": true,
+      "title": "Cloud Video Factory Demo Reel",
+      "caption": "إنتاج فيديو سحابي تلقائي بجودة عالية وبسرعة فائقة. #VideoFactory #Automation",
+      "audio": {
+        "voicePath": "audio/demo_001.wav",
+        "bgmPath": "audio/bgm.mp3",
+        "bgmVolume": 0.14,
+        "fallbackSeconds": 4
+      },
+      "captions": {
+        "enabled": true,
+        "language": "ar",
+        "wordsPerChunk": 4
+      },
+      "scenes": [
+        {
+          "type": "hook",
+          "weight": 1,
+          "badge": "أتمتة المحتوى",
+          "headline": "فيديوهات جاهزة للنشر خلال دقائق",
+          "subtext": "نظام سحابي متكامل لإنتاج الريلز بجودة 60 إطار"
+        },
+        {
+          "type": "stat",
+          "weight": 1,
+          "value": 10,
+          "prefix": "",
+          "suffix": "x",
+          "label": "سرعة مضاعفة في الإنتاج",
+          "sublabel": "رندر سحابي متوازٍ بدون أجهزة محلية"
+        },
+        {
+          "type": "ui_card",
+          "weight": 1,
+          "variant": "saas",
+          "appName": "VideoFactory Cloud",
+          "timestamp": "الآن",
+          "headerTitle": "دفعة الإنتاج مكتملة",
+          "items": [
+            {
+              "title": "تصميم متوافق مع هوية العلامة",
+              "status": "تم"
+            },
+            {
+              "title": "ترجمة تلقائية متزامنة بالكلمة",
+              "status": "تم"
+            },
+            {
+              "title": "رفع مباشر إلى Google Drive",
+              "status": "جاهز"
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "weight": 1,
+          "eyebrow": "ابدأ الآن",
+          "headline": "حوّل أفكارك إلى محتوى مستمر",
+          "subtext": "نظام إنتاج مرئي يعمل على مدار الساعة",
+          "ctaText": "اطلب العرض التجريبي"
+        }
+      ]
+    }
+  ]
+}

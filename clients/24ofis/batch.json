@@ -1,0 +1,76 @@
+{
+  "settings": {
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "skipExisting": true,
+    "defaultLanguage": "ar"
+  },
+  "videos": [
+    {
+      "id": "demo_001",
+      "enabled": true,
+      "title": "24Ofis Executive Office Demo",
+      "caption": "إدارة مكتبك وفريقك على مدار الساعة من لوحة واحدة مع 24Ofis. #24Ofis #Business #Management",
+      "audio": {
+        "voicePath": "audio/demo_001.wav",
+        "bgmPath": "audio/bgm.mp3",
+        "bgmVolume": 0.14,
+        "fallbackSeconds": 4
+      },
+      "captions": {
+        "enabled": true,
+        "language": "ar",
+        "wordsPerChunk": 4
+      },
+      "scenes": [
+        {
+          "type": "hook",
+          "weight": 1,
+          "badge": "الإدارة التنفيذية الذكية",
+          "headline": "مكتبك يعمل بكفاءة 24 ساعة",
+          "subtext": "نظام متكامل لتنظيم المهام، العملاء، والتقارير"
+        },
+        {
+          "type": "comparison",
+          "weight": 1,
+          "eyebrow": "الفرق في الإدارة",
+          "headline": "من الفوضى إلى الوضوح الكامل",
+          "before": {
+            "label": "قبل 24Ofis",
+            "title": "متابعة مشتتة",
+            "points": [
+              "ملفات متفرقة ومهام منسية",
+              "تأخر في الرد على العملاء"
+            ]
+          },
+          "after": {
+            "label": "مع 24Ofis",
+            "title": "تحكم تنفيذي شامل",
+            "points": [
+              "لوحة موحدة لكل الأقسام",
+              "تقارير أداء لحظية ودقيقة"
+            ]
+          }
+        },
+        {
+          "type": "stat",
+          "weight": 1,
+          "value": 3,
+          "prefix": "",
+          "suffix": "x",
+          "label": "سرعة إنجاز معاملات الفريق",
+          "sublabel": "بفضل سير العمل المؤتمت والواضح"
+        },
+        {
+          "type": "cta",
+          "weight": 1,
+          "eyebrow": "24Ofis",
+          "headline": "ارتقِ بإدارة شركتك اليوم",
+          "subtext": "جرّب المنصة مجاناً لمدة 14 يوماً",
+          "ctaText": "احجز عرضك التنفيذي"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "خدمات‌یار | Khidmatyar",
+  "dir": "rtl",
+  "fontFamily": "Vazirmatn, Cairo",
+  "bg": "#071A12",
+  "surface": "#0F291E",
+  "primary": "#D4AF37",
+  "accent": "#E6C76A",
+  "text": "#F7F6F2",
+  "mutedText": "#CBD5C0",
+  "logoPath": "logos/logo.png",
+  "handle": "@khidmatyar"
+}

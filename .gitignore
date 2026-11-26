@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Remotion build, cache, and rendered output
+output/
+.remotion/
+build/
+dist/
+
+# Heavy client media assets (synced via Google Drive / rclone)
+clients/**/audio/*.wav
+clients/**/audio/*.mp3
+clients/**/audio/*.m4a
+clients/**/audio/*.ogg
+clients/**/audio/*.flac
+clients/**/broll/*.mp4
+clients/**/broll/*.mov
+clients/**/broll/*.webm
+clients/**/broll/*.mkv
+clients/**/sfx/*.mp3
+clients/**/sfx/*.wav
+clients/**/sfx/*.m4a
+*.mp3
+*.wav
+
+# Keep client JSON configs and folder placeholders tracked in Git
+!clients/**/*.json
+!clients/**/.gitkeep
+
+# Python & environment artifacts
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.local
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.log

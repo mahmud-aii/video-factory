@@ -1,0 +1,26 @@
+{
+  "pacing": {
+    "style": "snappy",
+    "defaultFps": 60,
+    "minSceneSeconds": 0.9,
+    "breathingRoomSeconds": 0.5
+  },
+  "safeZones": {
+    "top": 220,
+    "bottom": 340,
+    "horizontal": 72
+  },
+  "transitionStyle": "spring-cut",
+  "captionStyle": {
+    "wordsPerChunk": 4,
+    "bottomOffset": 340,
+    "fontSize": 52,
+    "highlightActiveWord": true,
+    "rtlLetterSpacing": "0px"
+  },
+  "visualNotes": [
+    "Maintain >= 64px horizontal padding and keep focal points inside 9:16 mobile safe zones.",
+    "Strictly enforce letterSpacing: 0px and direction: rtl on all Arabic/Persian text.",
+    "Use high-contrast typography and crisp spring motion without decorative clutter."
+  ]
+}

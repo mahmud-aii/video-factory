@@ -1,0 +1,13 @@
+{
+  "name": "24Ofis",
+  "dir": "rtl",
+  "fontFamily": "Cairo",
+  "bg": "#0F172A",
+  "surface": "#1E293B",
+  "primary": "#F59E0B",
+  "accent": "#FBBF24",
+  "text": "#F8FAFC",
+  "mutedText": "#94A3B8",
+  "logoPath": "logos/logo.png",
+  "handle": "@24ofis"
+}
