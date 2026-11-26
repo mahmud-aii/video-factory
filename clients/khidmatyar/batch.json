@@ -9,14 +9,13 @@
   "videos": [
     {
       "id": "demo_001",
-      "enabled": false,
-      "title": "KHIDMATYAR Trusted Services Demo",
-      "caption": "خدمت يار | KHIDMATYAR؛ همراه مطمئن شما برای دریافت خدمات حرفه‌ای، شفاف و سریع. #KHIDMATYAR #خدمت_يار",
+      "enabled": true,
+      "title": "Khidmatyar Trusted Services Demo",
+      "caption": "خدمات‌یار؛ همراه مطمئن شما برای دریافت خدمات حرفه‌ای، شفاف و سریع. #Khidmatyar #خدمات_یار",
       "audio": {
         "voicePath": "audio/demo_001.wav",
         "bgmPath": "audio/bgm.mp3",
         "bgmVolume": 0.12,
-        "transitionSfxPath": "sfx/whoosh.mp3",
         "fallbackSeconds": 4
       },
       "captions": {
@@ -36,7 +35,7 @@
           "type": "broll_text",
           "weight": 1,
           "videoPath": "broll/demo_001.mp4",
-          "tag": "استاندارد خدمت يار",
+          "tag": "استاندارد خدمات‌یار",
           "headline": "هر خدمت با پیگیری دقیق و ضمانت کیفیت",
           "subtext": "از ثبت درخواست تا تحویل کامل در کنار شما هستیم"
         },
@@ -52,7 +51,7 @@
         {
           "type": "cta",
           "weight": 1,
-          "eyebrow": "خدمت يار | KHIDMATYAR",
+          "eyebrow": "خدمات‌یار",
           "headline": "همین امروز درخواست خود را ثبت کنید",
           "subtext": "پشتیبانی منظم و پاسخ‌گویی شفاف در هر مرحله",
           "ctaText": "ثبت درخواست خدمت"

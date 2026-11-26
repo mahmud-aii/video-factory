@@ -9,14 +9,13 @@
   "videos": [
     {
       "id": "demo_001",
-      "enabled": false,
-      "title": "TEKVIYO Cloud Automation Demo",
-      "caption": "TEKVIYO تبني لك أنظمة أتمتة ذكية تعمل 24/7 في السحابة بدون تدخل يدوي. #TEKVIYO #AI #Automation",
+      "enabled": true,
+      "title": "Tekviyo Cloud Automation Demo",
+      "caption": "تيكفيو تبني لك أنظمة أتمتة ذكية تعمل 24/7 في السحابة بدون تدخل يدوي. #Tekviyo #AI #Automation",
       "audio": {
         "voicePath": "audio/demo_001.wav",
         "bgmPath": "audio/bgm.mp3",
         "bgmVolume": 0.14,
-        "transitionSfxPath": "sfx/whoosh.mp3",
         "fallbackSeconds": 4
       },
       "captions": {
@@ -45,7 +44,7 @@
           "type": "ui_card",
           "weight": 1,
           "variant": "saas",
-          "appName": "TEKVIYO Cloud Engine",
+          "appName": "Tekviyo Cloud Engine",
           "timestamp": "مباشر",
           "headerTitle": "تحديث حالة خط الإنتاج",
           "items": [
@@ -66,7 +65,7 @@
         {
           "type": "cta",
           "weight": 1,
-          "eyebrow": "TEKVIYO",
+          "eyebrow": "تيكفيو | Tekviyo",
           "headline": "انقل أعمالك إلى الجيل القادم",
           "subtext": "احجز جلسة تحليل مجانية لعملياتك اليوم",
           "ctaText": "ابدأ الأتمتة الآن"

@@ -1,5 +1,5 @@
 {
-  "name": "24.ofis",
+  "name": "24Ofis",
   "dir": "rtl",
   "fontFamily": "Cairo",
   "bg": "#0F172A",
@@ -9,5 +9,5 @@
   "text": "#F8FAFC",
   "mutedText": "#94A3B8",
   "logoPath": "logos/logo.png",
-  "handle": "@24.ofis"
+  "handle": "@24ofis"
 }

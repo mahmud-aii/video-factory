@@ -38,7 +38,7 @@ async function main() {
 
   console.log(`\n=== VideoFactory Render: ${slug}/${videoId} ===`);
   console.log(
-    `Assets detected: logo=${inputProps.resolvedAssets.hasLogo}, voice=${inputProps.resolvedAssets.hasVoice}, bgm=${inputProps.resolvedAssets.hasBgm}, transitionSfx=${inputProps.resolvedAssets.hasTransitionSfx}, validVideos=${inputProps.resolvedAssets.validVideos.length}, validImages=${inputProps.resolvedAssets.validImages.length}, captionWords=${inputProps.captionWords.length}`
+    `Assets detected: logo=${inputProps.assets.hasLogo}, voice=${inputProps.assets.hasVoice}, bgm=${inputProps.assets.hasBgm}, validVideos=${inputProps.assets.validVideos.length}, captionWords=${inputProps.captionWords.length}`
   );
 
   const publicDir = path.resolve('clients');

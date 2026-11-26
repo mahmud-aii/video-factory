@@ -16,7 +16,6 @@
         "voicePath": "audio/demo_001.wav",
         "bgmPath": "audio/bgm.mp3",
         "bgmVolume": 0.14,
-        "transitionSfxPath": "sfx/whoosh.mp3",
         "fallbackSeconds": 4
       },
       "captions": {

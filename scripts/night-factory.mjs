@@ -86,9 +86,6 @@ async function main() {
       console.log(`\n[RENDER] ${key}`);
       fs.mkdirSync(dir, { recursive: true });
       const inputProps = buildInputProps(slug, workspace, job);
-      console.log(
-        `  Assets: logo=${inputProps.resolvedAssets.hasLogo}, voice=${inputProps.resolvedAssets.hasVoice}, bgm=${inputProps.resolvedAssets.hasBgm}, transitionSfx=${inputProps.resolvedAssets.hasTransitionSfx}, validVideos=${inputProps.resolvedAssets.validVideos.length}, validImages=${inputProps.resolvedAssets.validImages.length}`
-      );
 
       const composition = await selectComposition({
         serveUrl,

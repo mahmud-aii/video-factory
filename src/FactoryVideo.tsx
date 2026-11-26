@@ -20,7 +20,7 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
   brand,
   styleRules,
   job,
-  resolvedAssets,
+  assets,
   captionWords,
 }) => {
   const frame = useCurrentFrame();
@@ -33,18 +33,7 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
 
   const safeZones = getSafeZones(styleRules);
   const bgmBaseVolume = job.audio.bgmVolume ?? 0.14;
-  // Smooth 0.4s BGM fade-out at the end of the video
-  const bgmFadeFrames = Math.min(
-    Math.round(fps * 0.4),
-    Math.max(1, Math.floor(durationInFrames / 4))
-  );
-  const hasTransitionSfx = Boolean(
-    resolvedAssets.hasTransitionSfx && job.audio.transitionSfxPath
-  );
-  const transitionSfxSrc =
-    hasTransitionSfx && job.audio.transitionSfxPath
-      ? clientAsset(brandSlug, job.audio.transitionSfxPath)
-      : '';
+  const fadeFrames = Math.min(Math.round(fps * 0.45), Math.max(1, Math.floor(durationInFrames / 4)));
 
   return (
     <AbsoluteFill
@@ -68,16 +57,16 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
       />
 
       {/* Audio Tracks (rendered strictly when assets exist on disk) */}
-      {resolvedAssets.hasVoice && job.audio.voicePath ? (
+      {assets.hasVoice && job.audio.voicePath ? (
         <Audio src={clientAsset(brandSlug, job.audio.voicePath)} volume={1} />
       ) : null}
 
-      {resolvedAssets.hasBgm && job.audio.bgmPath ? (
+      {assets.hasBgm && job.audio.bgmPath ? (
         <Audio
           src={clientAsset(brandSlug, job.audio.bgmPath)}
           loop
           volume={(f) => {
-            const fadeOutStart = Math.max(0, durationInFrames - bgmFadeFrames);
+            const fadeOutStart = Math.max(0, durationInFrames - fadeFrames);
             if (f <= fadeOutStart) {
               return bgmBaseVolume;
             }
@@ -89,22 +78,19 @@ export const FactoryVideo: React.FC<FactoryVideoProps> = ({
         />
       ) : null}
 
-      {/* Proportional Lego Scene Sequences (zero black frames) + optional transition SFX */}
+      {/* Proportional Lego Scene Sequences (zero black frames) */}
       {scheduledScenes.map((scheduled) => (
         <Sequence
           key={scheduled.scene.id ?? `scene-${scheduled.index}-${scheduled.scene.type}`}
           from={scheduled.from}
           durationInFrames={scheduled.durationInFrames}
         >
-          {scheduled.index >= 1 && transitionSfxSrc ? (
-            <Audio src={transitionSfxSrc} volume={0.25} />
-          ) : null}
           <SceneRouter
             scene={scheduled.scene}
             brandSlug={brandSlug}
             brand={brand}
             styleRules={styleRules}
-            resolvedAssets={resolvedAssets}
+            assets={assets}
             durationInFrames={scheduled.durationInFrames}
           />
         </Sequence>

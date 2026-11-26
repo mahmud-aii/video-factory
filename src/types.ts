@@ -34,7 +34,6 @@ export type StyleRules = {
     highlightActiveWord: boolean;
     rtlLetterSpacing: '0px';
   };
-  accentMaxUsagePercent?: number;
   visualNotes: string[];
 };
 
@@ -48,7 +47,6 @@ export type AudioConfig = {
   voicePath?: string;
   bgmPath?: string;
   bgmVolume?: number;
-  transitionSfxPath?: string;
   fallbackSeconds: number;
 };
 
@@ -83,16 +81,6 @@ export type StatScene = BaseScene & {
 export type BrollTextScene = BaseScene & {
   type: 'broll_text';
   videoPath?: string;
-  tag?: string;
-  headline: string;
-  subtext?: string;
-  overlayOpacity?: number;
-};
-
-export type ImageTextScene = BaseScene & {
-  type: 'image_text';
-  imagePath?: string;
-  zoom?: 'in' | 'out';
   tag?: string;
   headline: string;
   subtext?: string;
@@ -137,16 +125,13 @@ export type CtaScene = BaseScene & {
   footerText?: string;
 };
 
-export type SceneItem =
+export type SceneConfig =
   | HookScene
   | StatScene
   | BrollTextScene
-  | ImageTextScene
   | ComparisonScene
   | UiCardScene
   | CtaScene;
-
-export type SceneConfig = SceneItem;
 
 export type VideoJob = {
   id: string;
@@ -155,7 +140,7 @@ export type VideoJob = {
   caption?: string;
   audio: AudioConfig;
   captions?: CaptionsConfig;
-  scenes: SceneItem[];
+  scenes: SceneConfig[];
 };
 
 export type BatchSettings = {
@@ -171,22 +156,18 @@ export type BatchConfig = {
   videos: VideoJob[];
 };
 
-export type ResolvedAssets = {
+export type AssetAvailability = {
   hasLogo: boolean;
   hasVoice: boolean;
   hasBgm: boolean;
-  hasTransitionSfx: boolean;
   validVideos: string[];
-  validImages: string[];
 };
-
-export type AssetAvailability = ResolvedAssets;
 
 export type FactoryVideoProps = {
   brandSlug: string;
   brand: BrandConfig;
   styleRules?: StyleRules;
   job: VideoJob;
-  resolvedAssets: ResolvedAssets;
+  assets: AssetAvailability;
   captionWords: CaptionWord[];
 };

@@ -9,14 +9,13 @@
   "videos": [
     {
       "id": "demo_001",
-      "enabled": false,
-      "title": "24wats WhatsApp Automation Demo",
-      "caption": "رد فوري على عملائك عبر واتساب خلال ثوانٍ وبشكل آلي بالكامل مع 24wats. #24wats #WhatsAppAutomation",
+      "enabled": true,
+      "title": "24Wats WhatsApp Automation Demo",
+      "caption": "رد فوري على عملائك عبر واتساب خلال ثوانٍ وبشكل آلي بالكامل مع 24Wats. #24Wats #WhatsAppAutomation",
       "audio": {
         "voicePath": "audio/demo_001.wav",
         "bgmPath": "audio/bgm.mp3",
         "bgmVolume": 0.14,
-        "transitionSfxPath": "sfx/whoosh.mp3",
         "fallbackSeconds": 4
       },
       "captions": {
@@ -36,7 +35,7 @@
           "type": "ui_card",
           "weight": 1,
           "variant": "whatsapp",
-          "appName": "24wats Bot",
+          "appName": "24Wats Bot",
           "timestamp": "الآن",
           "headerTitle": "محادثة عميل جديدة",
           "items": [
@@ -65,10 +64,10 @@
         {
           "type": "cta",
           "weight": 1,
-          "eyebrow": "24wats",
+          "eyebrow": "24Wats",
           "headline": "فعّل واتساب شركتك اليوم",
           "subtext": "ربط رسمي سريع خلال أقل من 15 دقيقة",
-          "ctaText": "جرّب 24wats الآن"
+          "ctaText": "جرّب 24Wats الآن"
         }
       ]
     }
