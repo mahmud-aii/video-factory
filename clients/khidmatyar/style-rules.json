@@ -18,9 +18,11 @@
     "highlightActiveWord": true,
     "rtlLetterSpacing": "0px"
   },
+  "accentMaxUsagePercent": 5,
   "visualNotes": [
-    "Deep emerald (#071A12) with warm ivory (#F7F6F2) typography and restrained gold (#D4AF37) accents.",
-    "Refined editorial pacing; calm elegance without aggressive neon glows.",
-    "Vazirmatn primary with Cairo fallback; strictly 0px letter-spacing for Persian/Arabic ligatures."
+    "Brand identity: خدمت يار | KHIDMATYAR (@khidmatyar) — trusted, dignified service identity.",
+    "Color hierarchy: deep emerald (#071A12) primary canvas, warm ivory (#F7F6F2) typography, and restrained gold (#D4AF37) strictly capped at <=5% of total frame area (hairline accents, active caption word, subtle badges/CTA).",
+    "Never flood backgrounds or large surfaces with gold; preserve calm editorial restraint without neon glare.",
+    "Typography: Vazirmatn, Cairo, sans-serif with strictly 0px letter-spacing on all RTL Arabic/Persian text."
   ]
 }

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { hexToRgba } from '../lib/color';
-import { getSafeZones, rtlSafeTextStyle } from '../lib/rtl';
+import { getSafeZones, formatBidiText, rtlSafeTextStyle } from '../lib/rtl';
 import type { BrandConfig, CaptionWord, StyleRules } from '../types';
 
 type CaptionChunk = {
@@ -201,7 +201,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
                   : `0 2px 8px ${hexToRgba('#000000', 0.55)}`,
               }}
             >
-              {item.word}
+              {formatBidiText(item.word, brand.dir)}
             </span>
           );
         })}
