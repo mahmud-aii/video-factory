@@ -13,21 +13,22 @@ video-factory/
 │   │   ├── batch.json            # Video jobs + scenes + audio/caption settings
 │   │   ├── logos/.gitkeep        # Brand logos (logo.png)
 │   │   ├── audio/.gitkeep        # Voiceovers (.wav/.mp3), BGM, .captions.json (media gitignored)
+│   │   ├── images/.gitkeep       # Ken Burns still images (.png/.jpg/.jpeg/.webp gitignored)
 │   │   ├── broll/.gitkeep        # B-roll clips (.mp4 gitignored)
-│   │   └── sfx/.gitkeep          # Sound effects (.mp3/.wav gitignored)
-│   ├── tekviyo/                  # Dark tech (#0B0F19) + emerald (#10B981), RTL Cairo
-│   ├── 24ofis/                   # Executive navy (#0F172A) + amber (#F59E0B), RTL Cairo
-│   ├── 24wats/                   # Deep green (#071A12) + WhatsApp green (#25D366), RTL Cairo
-│   └── khidmatyar/               # Deep emerald (#071A12) + ivory (#F7F6F2) + gold (#D4AF37), RTL Vazirmatn/Cairo
+│   │   └── sfx/.gitkeep          # Optional transition SFX (e.g. sfx/whoosh.mp3, gitignored)
+│   ├── tekviyo/                  # TEKVIYO (@tekviyo) — dark tech (#0B0F19) + emerald (#10B981), RTL Cairo
+│   ├── 24ofis/                   # 24.ofis (@24.ofis) — navy (#0F172A) + amber (#F59E0B), RTL Cairo
+│   ├── 24wats/                   # 24wats (@24wats) — deep green (#071A12) + WhatsApp green (#25D366), RTL Cairo
+│   └── khidmatyar/               # خدمت يار | KHIDMATYAR (@khidmatyar) — emerald (#071A12), ivory (#F7F6F2), <=5% gold (#D4AF37), Vazirmatn/Cairo
 ├── src/
 │   ├── index.ts                  # Remotion entry point
 │   ├── Root.tsx                  # FactoryReel composition (1080x1920 @ 60fps) + calculateMetadata
-│   ├── FactoryVideo.tsx          # Proportional scene scheduler, audio tracks, progress bar, captions
-│   ├── types.ts                  # Strict TypeScript schemas
+│   ├── FactoryVideo.tsx          # Proportional scene scheduler, 0.4s BGM fade-out, transition SFX, progress bar, captions
+│   ├── types.ts                  # Strict TypeScript schemas (SceneItem, ResolvedAssets, etc.)
 │   ├── components/
 │   │   └── CaptionOverlay.tsx    # 3–4 word chunked captions, active-word highlight, RTL-safe
 │   ├── scenes/
-│   │   └── SceneRouter.tsx       # 6 Lego scenes: hook, stat, broll_text, comparison, ui_card, cta
+│   │   └── SceneRouter.tsx       # 7 Lego scenes: hook, stat, broll_text, image_text, comparison, ui_card, cta
 │   └── lib/
 │       ├── fonts.ts              # Module-scope Google Fonts (Cairo, Vazirmatn, Inter, JetBrainsMono)
 │       ├── assets.ts             # Forward-slash clientAsset() resolver
@@ -40,7 +41,7 @@ video-factory/
 │   ├── render-one.mjs            # Single-video Remotion cloud renderer + .txt caption sidecar
 │   ├── night-factory.mjs         # Sequential local/fallback batch runner (bundles once)
 │   ├── transcribe.py             # Standalone Faster-Whisper (small, cpu, int8) word timestamps
-│   └── lib/factory-utils.mjs     # Shared workspace, asset existence, and caption loaders
+│   └── lib/factory-utils.mjs     # Shared workspace, resolvedAssets (validVideos/validImages/hasTransitionSfx), and captions
 ├── .github/workflows/
 │   └── render-factory.yml        # Parallel Matrix GitHub Actions pipeline (max-parallel: 5)
 ├── workflows/
@@ -64,15 +65,15 @@ npm run dev
 
 ### 3. Render a Single Video Locally
 
-Every starter brand includes a 4-second `demo_001` reel requiring **zero external media**:
+Every brand includes a 4-second `demo_001` reel requiring **zero external media** (disabled by default in starter `batch.json` files so cloud runs skip demos unless enabled):
 
 ```bash
-npm run render-one -- tekviyo demo_001
+npm run render-one -- 24ofis demo_001
 ```
 
 Outputs are written to:
-- `output/tekviyo/demo_001.mp4` (H.264, `1080x1920`, `60fps`)
-- `output/tekviyo/demo_001.txt` (social media post caption)
+- `output/24ofis/demo_001.mp4` (H.264, `1080x1920`, `60fps`)
+- `output/24ofis/demo_001.txt` (social media post caption)
 
 ### 4. Create a New Client Workspace
 
@@ -87,11 +88,11 @@ Validates lowercase `a-z0-9-`, clones `clients/_template/`, updates `brand.json`
 ```bash
 # Inspect the GitHub Actions job matrix locally
 npm run plan -- all
-npm run plan -- tekviyo
+npm run plan -- 24ofis
 
 # Run all enabled jobs sequentially (bundles once, skips existing MP4s)
 npm run factory
-npm run factory -- tekviyo
+npm run factory -- 24ofis
 npm run factory -- all --force
 ```
 
@@ -102,11 +103,12 @@ npm run factory -- all --force
 | `hook` | Kinetic badge + display headline + animated accent bar + subtext | Optional subtext |
 | `stat` | Animated counting metric (`prefix`, `value`, `suffix`) + label | Tabular monospace LTR number cluster inside RTL layouts |
 | `broll_text` | Muted `<OffthreadVideo>` + dark gradient overlay + kinetic text | Styled animated dot-grid canvas when video file is missing |
+| `image_text` | Ken Burns `<Img>` (`zoom: "in"` 1.0→1.12 or `"out"` 1.12→1.0) + dark readability gradient + RTL text | Styled animated dot-grid canvas when image file is missing |
 | `comparison` | High-contrast Before / After cards stacked for 9:16 mobile | Optional eyebrow & headline |
 | `ui_card` | Clean SaaS or WhatsApp (`variant: "saas" \| "whatsapp"`) notification card | Supports plain strings or `{ title, detail, status }` items |
 | `cta` | Brand logo + bold closing headline + animated CTA pill | Hides logo gracefully when `logoPath` file is missing |
 
-All RTL brands enforce `direction: "rtl"`, `letterSpacing: "0px"`, and `>= 64px` horizontal padding inside 9:16 mobile safe zones.
+All RTL brands enforce `direction: "rtl"`, `letterSpacing: "0px"`, and `>= 64px` horizontal padding inside 9:16 mobile safe zones. Audio tracks support smooth **0.4s** BGM end fade-out and optional `audio.transitionSfxPath` (e.g. `sfx/whoosh.mp3`) played softly (`volume: 0.25`) at scene transitions from scene index 1 onward when present.
 
 ## Auto-Captions (`Faster-Whisper`)
 

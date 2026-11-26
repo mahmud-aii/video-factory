@@ -53,18 +53,30 @@ export function loadClientWorkspace(slug) {
   return { clientDir, brand, styleRules, batch };
 }
 
-export function detectClientAssets(slug, brand, job) {
+export function resolveClientAssets(slug, brand, job) {
   const hasLogo = clientFileExists(slug, brand.logoPath);
   const hasVoice = clientFileExists(slug, job.audio?.voicePath);
   const hasBgm = clientFileExists(slug, job.audio?.bgmPath);
+  const hasTransitionSfx = clientFileExists(slug, job.audio?.transitionSfxPath);
 
   const validVideoSet = new Set();
+  const validImageSet = new Set();
   const scenes = Array.isArray(job.scenes) ? job.scenes : [];
+
   for (const scene of scenes) {
-    if (scene && scene.type === 'broll_text' && scene.videoPath) {
+    if (!scene) {
+      continue;
+    }
+    if (scene.type === 'broll_text' && scene.videoPath) {
       const normalized = normalizeAssetPath(scene.videoPath);
       if (clientFileExists(slug, normalized)) {
         validVideoSet.add(normalized);
+      }
+    }
+    if (scene.type === 'image_text' && scene.imagePath) {
+      const normalized = normalizeAssetPath(scene.imagePath);
+      if (clientFileExists(slug, normalized)) {
+        validImageSet.add(normalized);
       }
     }
   }
@@ -73,9 +85,13 @@ export function detectClientAssets(slug, brand, job) {
     hasLogo,
     hasVoice,
     hasBgm,
+    hasTransitionSfx,
     validVideos: Array.from(validVideoSet),
+    validImages: Array.from(validImageSet),
   };
 }
+
+export const detectClientAssets = resolveClientAssets;
 
 export function loadCaptionWords(slug, videoId) {
   const captionsPath = path.join(CLIENTS_DIR, slug, 'audio', `${videoId}.captions.json`);
@@ -103,7 +119,7 @@ export function loadCaptionWords(slug, videoId) {
 }
 
 export function buildInputProps(slug, workspace, job) {
-  const assets = detectClientAssets(slug, workspace.brand, job);
+  const resolvedAssets = resolveClientAssets(slug, workspace.brand, job);
   const captionWords = loadCaptionWords(slug, job.id);
 
   return {
@@ -111,7 +127,7 @@ export function buildInputProps(slug, workspace, job) {
     brand: workspace.brand,
     styleRules: workspace.styleRules,
     job,
-    assets,
+    resolvedAssets,
     captionWords,
   };
 }

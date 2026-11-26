@@ -24,11 +24,13 @@ const defaultProps: FactoryVideoProps = {
   brand: defaultBrand,
   styleRules: defaultStyleRules,
   job: defaultJob,
-  assets: {
+  resolvedAssets: {
     hasLogo: false,
     hasVoice: false,
     hasBgm: false,
+    hasTransitionSfx: false,
     validVideos: [],
+    validImages: [],
   },
   captionWords: [],
 };
@@ -48,7 +50,7 @@ const calculateMetadata: CalculateMetadataFunction<FactoryVideoProps> = async ({
 
   let totalSeconds = fallbackSeconds;
 
-  if (props.assets?.hasVoice && props.job.audio?.voicePath) {
+  if (props.resolvedAssets?.hasVoice && props.job.audio?.voicePath) {
     try {
       const voiceUrl = clientAsset(props.brandSlug, props.job.audio.voicePath);
       const measuredSeconds = await getAudioDurationInSeconds(voiceUrl);

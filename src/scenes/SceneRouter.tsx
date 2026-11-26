@@ -12,15 +12,16 @@ import {
 import { clientAsset, normalizeAssetPath } from '../lib/assets';
 import { getContrastInk, hexToRgba } from '../lib/color';
 import { MONO_FONT_FAMILY } from '../lib/fonts';
-import { getSafeZones, rtlSafeTextStyle } from '../lib/rtl';
+import { formatBidiText, getSafeZones, rtlSafeTextStyle } from '../lib/rtl';
 import type {
-  AssetAvailability,
   BrandConfig,
   BrollTextScene,
   ComparisonScene,
   CtaScene,
   HookScene,
-  SceneConfig,
+  ImageTextScene,
+  ResolvedAssets,
+  SceneItem,
   StatScene,
   StyleRules,
   UiCardItem,
@@ -28,11 +29,11 @@ import type {
 } from '../types';
 
 export type SceneRouterProps = {
-  scene: SceneConfig;
+  scene: SceneItem;
   brandSlug: string;
   brand: BrandConfig;
   styleRules?: StyleRules;
-  assets: AssetAvailability;
+  resolvedAssets: ResolvedAssets;
   durationInFrames: number;
 };
 
@@ -334,9 +335,9 @@ const BrollTextSceneView: React.FC<{
   brandSlug: string;
   brand: BrandConfig;
   styleRules?: StyleRules;
-  assets: AssetAvailability;
+  resolvedAssets: ResolvedAssets;
   durationInFrames: number;
-}> = ({ scene, brandSlug, brand, styleRules, assets, durationInFrames }) => {
+}> = ({ scene, brandSlug, brand, styleRules, resolvedAssets, durationInFrames }) => {
   const frame = useCurrentFrame();
   const tagMotion = useEntrance(0, styleRules);
   const textMotion = useEntrance(6, styleRules);
@@ -344,7 +345,7 @@ const BrollTextSceneView: React.FC<{
 
   const normalizedVideoPath = scene.videoPath ? normalizeAssetPath(scene.videoPath) : '';
   const hasValidVideo = Boolean(
-    normalizedVideoPath && assets.validVideos.includes(normalizedVideoPath)
+    normalizedVideoPath && resolvedAssets.validVideos.includes(normalizedVideoPath)
   );
 
   const zoom = interpolate(frame, [0, Math.max(1, durationInFrames)], [1.0, 1.06], {
@@ -472,6 +473,166 @@ const BrollTextSceneView: React.FC<{
                 }),
                 opacity: subMotion.opacity,
                 transform: subMotion.transform,
+              }}
+            >
+              {scene.subtext}
+            </p>
+          ) : null}
+        </div>
+      </SafeStage>
+    </AbsoluteFill>
+  );
+};
+
+const ImageTextSceneView: React.FC<{
+  scene: ImageTextScene;
+  brandSlug: string;
+  brand: BrandConfig;
+  styleRules?: StyleRules;
+  resolvedAssets: ResolvedAssets;
+  durationInFrames: number;
+}> = ({ scene, brandSlug, brand, styleRules, resolvedAssets, durationInFrames }) => {
+  const frame = useCurrentFrame();
+  const tagMotion = useEntrance(0, styleRules);
+  const headlineMotion = useEntrance(5, styleRules);
+  const subtextMotion = useEntrance(12, styleRules);
+
+  const normalizedImagePath = scene.imagePath ? normalizeAssetPath(scene.imagePath) : '';
+  const hasValidImage = Boolean(
+    normalizedImagePath && resolvedAssets.validImages.includes(normalizedImagePath)
+  );
+
+  const zoomMode = scene.zoom ?? 'in';
+  const kenBurnsScale = interpolate(
+    frame,
+    [0, Math.max(1, durationInFrames)],
+    zoomMode === 'out' ? [1.12, 1.0] : [1.0, 1.12],
+    {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    }
+  );
+  const overlayOpacity = scene.overlayOpacity ?? 0.68;
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: brand.bg, overflow: 'hidden' }}>
+      {hasValidImage ? (
+        <AbsoluteFill style={{ transform: `scale(${kenBurnsScale})` }}>
+          <Img
+            src={clientAsset(brandSlug, normalizedImagePath)}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        </AbsoluteFill>
+      ) : (
+        /* Graceful styled dot-grid fallback when imagePath is missing */
+        <AbsoluteFill
+          style={{
+            backgroundColor: brand.bg,
+            backgroundImage: `radial-gradient(${hexToRgba(brand.primary, 0.28)} 2px, transparent 2px)`,
+            backgroundSize: '42px 42px',
+            backgroundPosition: `${(frame * 0.3) % 42}px ${(frame * 0.2) % 42}px`,
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `radial-gradient(circle at 78% 22%, ${hexToRgba(
+                brand.primary,
+                0.22
+              )}, transparent 52%), radial-gradient(circle at 20% 78%, ${hexToRgba(
+                brand.accent,
+                0.16
+              )}, transparent 50%)`,
+            }}
+          />
+        </AbsoluteFill>
+      )}
+
+      {/* Dark readability gradient overlay */}
+      <AbsoluteFill
+        style={{
+          background: `linear-gradient(180deg, ${hexToRgba(
+            brand.bg,
+            Math.max(0.42, overlayOpacity - 0.18)
+          )} 0%, ${hexToRgba(brand.bg, overlayOpacity)} 55%, ${hexToRgba(
+            brand.bg,
+            Math.min(0.95, overlayOpacity + 0.24)
+          )} 100%)`,
+        }}
+      />
+
+      <SafeStage brand={brand} styleRules={styleRules}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 30,
+            padding: '54px 48px',
+            borderRadius: 36,
+            backgroundColor: hexToRgba(brand.surface, 0.74),
+            border: `1.5px solid ${hexToRgba(brand.primary, 0.4)}`,
+            boxShadow: `0 24px 64px ${hexToRgba('#000000', 0.48)}`,
+          }}
+        >
+          {scene.tag ? (
+            <div
+              style={{
+                opacity: tagMotion.opacity,
+                transform: tagMotion.transform,
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                padding: '10px 24px',
+                borderRadius: 999,
+                backgroundColor: hexToRgba(brand.primary, 0.18),
+                border: `1px solid ${hexToRgba(brand.primary, 0.55)}`,
+              }}
+            >
+              <span
+                style={rtlSafeTextStyle(brand, {
+                  fontSize: 30,
+                  fontWeight: 700,
+                  color: brand.accent,
+                  lineHeight: 1.2,
+                })}
+              >
+                {scene.tag}
+              </span>
+            </div>
+          ) : null}
+
+          <h2
+            style={{
+              ...rtlSafeTextStyle(brand, {
+                fontSize: 74,
+                fontWeight: 900,
+                color: brand.text,
+                lineHeight: 1.26,
+                margin: 0,
+              }),
+              opacity: headlineMotion.opacity,
+              transform: headlineMotion.transform,
+            }}
+          >
+            {scene.headline}
+          </h2>
+
+          {scene.subtext ? (
+            <p
+              style={{
+                ...rtlSafeTextStyle(brand, {
+                  fontSize: 38,
+                  fontWeight: 500,
+                  color: brand.mutedText ?? hexToRgba(brand.text, 0.84),
+                  lineHeight: 1.48,
+                  margin: 0,
+                }),
+                opacity: subtextMotion.opacity,
+                transform: subtextMotion.transform,
               }}
             >
               {scene.subtext}
@@ -918,8 +1079,8 @@ const CtaSceneView: React.FC<{
   brandSlug: string;
   brand: BrandConfig;
   styleRules?: StyleRules;
-  assets: AssetAvailability;
-}> = ({ scene, brandSlug, brand, styleRules, assets }) => {
+  resolvedAssets: ResolvedAssets;
+}> = ({ scene, brandSlug, brand, styleRules, resolvedAssets }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const logoMotion = useEntrance(0, styleRules);
@@ -927,7 +1088,7 @@ const CtaSceneView: React.FC<{
   const pillMotion = useEntrance(12, styleRules);
 
   const pulse = 1 + Math.sin((frame / fps) * Math.PI * 2.2) * 0.025;
-  const showLogo = assets.hasLogo && Boolean(brand.logoPath);
+  const showLogo = resolvedAssets.hasLogo && Boolean(brand.logoPath);
 
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
@@ -1075,14 +1236,99 @@ const CtaSceneView: React.FC<{
   );
 };
 
+function formatSceneForBidi(scene: SceneItem, dir: BrandConfig['dir']): SceneItem {
+  if (dir !== 'rtl') {
+    return scene;
+  }
+  const f = (value: string) => formatBidiText(value, dir);
+  const fo = (value?: string) => (value ? formatBidiText(value, dir) : value);
+
+  switch (scene.type) {
+    case 'hook':
+      return {
+        ...scene,
+        badge: f(scene.badge),
+        headline: f(scene.headline),
+        subtext: fo(scene.subtext),
+      };
+    case 'stat':
+      return {
+        ...scene,
+        label: f(scene.label),
+        sublabel: fo(scene.sublabel),
+      };
+    case 'broll_text':
+      return {
+        ...scene,
+        tag: fo(scene.tag),
+        headline: f(scene.headline),
+        subtext: fo(scene.subtext),
+      };
+    case 'image_text':
+      return {
+        ...scene,
+        tag: fo(scene.tag),
+        headline: f(scene.headline),
+        subtext: fo(scene.subtext),
+      };
+    case 'comparison':
+      return {
+        ...scene,
+        eyebrow: fo(scene.eyebrow),
+        headline: fo(scene.headline),
+        before: {
+          label: f(scene.before.label),
+          title: f(scene.before.title),
+          points: scene.before.points.map(f),
+        },
+        after: {
+          label: f(scene.after.label),
+          title: f(scene.after.title),
+          points: scene.after.points.map(f),
+        },
+      };
+    case 'ui_card':
+      return {
+        ...scene,
+        appName: f(scene.appName),
+        timestamp: fo(scene.timestamp),
+        headerTitle: f(scene.headerTitle),
+        items: scene.items.map((item) =>
+          typeof item === 'string'
+            ? f(item)
+            : {
+                title: f(item.title),
+                detail: fo(item.detail),
+                status: fo(item.status),
+              }
+        ),
+      };
+    case 'cta':
+      return {
+        ...scene,
+        eyebrow: fo(scene.eyebrow),
+        headline: f(scene.headline),
+        subtext: fo(scene.subtext),
+        ctaText: f(scene.ctaText),
+        footerText: fo(scene.footerText),
+      };
+    default: {
+      const exhaustiveCheck: never = scene;
+      return exhaustiveCheck;
+    }
+  }
+}
+
 export const SceneRouter: React.FC<SceneRouterProps> = ({
-  scene,
+  scene: rawScene,
   brandSlug,
   brand,
   styleRules,
-  assets,
+  resolvedAssets,
   durationInFrames,
 }) => {
+  const scene = formatSceneForBidi(rawScene, brand.dir);
+
   switch (scene.type) {
     case 'hook':
       return <HookSceneView scene={scene} brand={brand} styleRules={styleRules} />;
@@ -1102,7 +1348,18 @@ export const SceneRouter: React.FC<SceneRouterProps> = ({
           brandSlug={brandSlug}
           brand={brand}
           styleRules={styleRules}
-          assets={assets}
+          resolvedAssets={resolvedAssets}
+          durationInFrames={durationInFrames}
+        />
+      );
+    case 'image_text':
+      return (
+        <ImageTextSceneView
+          scene={scene}
+          brandSlug={brandSlug}
+          brand={brand}
+          styleRules={styleRules}
+          resolvedAssets={resolvedAssets}
           durationInFrames={durationInFrames}
         />
       );
@@ -1117,7 +1374,7 @@ export const SceneRouter: React.FC<SceneRouterProps> = ({
           brandSlug={brandSlug}
           brand={brand}
           styleRules={styleRules}
-          assets={assets}
+          resolvedAssets={resolvedAssets}
         />
       );
     default: {

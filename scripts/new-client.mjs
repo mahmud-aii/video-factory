@@ -65,9 +65,9 @@ console.log(`  2. Tune pacing & safe zones in clients/${rawSlug}/style-rules.jso
 console.log(`  3. Edit video jobs in clients/${rawSlug}/batch.json`);
 console.log('  4. Drop heavy media into Google Drive (or locally for dev — gitignored):');
 console.log(`       - Logos : clients/${rawSlug}/logos/logo.png`);
-console.log(`       - Voice : clients/${rawSlug}/audio/<videoId>.wav (or .mp3)`);
-console.log(`       - BGM   : clients/${rawSlug}/audio/bgm.mp3`);
+console.log(`       - Audio : clients/${rawSlug}/audio/<videoId>.wav (or .mp3) & bgm.mp3`);
+console.log(`       - Images: clients/${rawSlug}/images/<photo>.jpg (or .png/.webp)`);
 console.log(`       - B-Roll: clients/${rawSlug}/broll/<clip>.mp4`);
-console.log(`       - SFX   : clients/${rawSlug}/sfx/<effect>.mp3`);
+console.log(`       - SFX   : clients/${rawSlug}/sfx/whoosh.mp3`);
 console.log(`     Cloud Drive path: gdrive:Video-Factory/clients/${rawSlug}/`);
 console.log(`  5. Local test render: npm run render-one -- ${rawSlug} demo_001\n`);
