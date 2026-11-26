@@ -1,0 +1,26 @@
+{
+  "pacing": {
+    "style": "snappy",
+    "defaultFps": 60,
+    "minSceneSeconds": 0.9,
+    "breathingRoomSeconds": 0.5
+  },
+  "safeZones": {
+    "top": 220,
+    "bottom": 340,
+    "horizontal": 72
+  },
+  "transitionStyle": "spring-cut",
+  "captionStyle": {
+    "wordsPerChunk": 4,
+    "bottomOffset": 340,
+    "fontSize": 52,
+    "highlightActiveWord": true,
+    "rtlLetterSpacing": "0px"
+  },
+  "visualNotes": [
+    "Dark tech slate canvas (#0B0F19) with crisp emerald (#10B981) focal highlights.",
+    "High-velocity spring motion tailored for AI & cloud engineering audiences.",
+    "Zero letter-spacing on Arabic RTL typography; tabular monospace for metrics."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "settings": {
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "skipExisting": true,
+    "defaultLanguage": "fa"
+  },
+  "videos": [
+    {
+      "id": "demo_001",
+      "enabled": true,
+      "title": "Khidmatyar Trusted Services Demo",
+      "caption": "خدمات‌یار؛ همراه مطمئن شما برای دریافت خدمات حرفه‌ای، شفاف و سریع. #Khidmatyar #خدمات_یار",
+      "audio": {
+        "voicePath": "audio/demo_001.wav",
+        "bgmPath": "audio/bgm.mp3",
+        "bgmVolume": 0.12,
+        "fallbackSeconds": 4
+      },
+      "captions": {
+        "enabled": true,
+        "language": "fa",
+        "wordsPerChunk": 4
+      },
+      "scenes": [
+        {
+          "type": "hook",
+          "weight": 1,
+          "badge": "خدمات مطمئن و حرفه‌ای",
+          "headline": "کیفیت، شفافیت و آرامش خاطر",
+          "subtext": "دسترسی آسان به متخصصان تأییدشده در کمترین زمان"
+        },
+        {
+          "type": "broll_text",
+          "weight": 1,
+          "videoPath": "broll/demo_001.mp4",
+          "tag": "استاندارد خدمات‌یار",
+          "headline": "هر خدمت با پیگیری دقیق و ضمانت کیفیت",
+          "subtext": "از ثبت درخواست تا تحویل کامل در کنار شما هستیم"
+        },
+        {
+          "type": "stat",
+          "weight": 1,
+          "value": 98,
+          "prefix": "",
+          "suffix": "%",
+          "label": "رضایت مشتریان از خدمات انجام‌شده",
+          "sublabel": "بر اساس ارزیابی واقعی درخواست‌های تکمیل‌شده"
+        },
+        {
+          "type": "cta",
+          "weight": 1,
+          "eyebrow": "خدمات‌یار",
+          "headline": "همین امروز درخواست خود را ثبت کنید",
+          "subtext": "پشتیبانی منظم و پاسخ‌گویی شفاف در هر مرحله",
+          "ctaText": "ثبت درخواست خدمت"
+        }
+      ]
+    }
+  ]
+}

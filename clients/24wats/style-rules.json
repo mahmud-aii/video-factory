@@ -1,0 +1,26 @@
+{
+  "pacing": {
+    "style": "snappy",
+    "defaultFps": 60,
+    "minSceneSeconds": 0.9,
+    "breathingRoomSeconds": 0.5
+  },
+  "safeZones": {
+    "top": 220,
+    "bottom": 340,
+    "horizontal": 72
+  },
+  "transitionStyle": "spring-cut",
+  "captionStyle": {
+    "wordsPerChunk": 4,
+    "bottomOffset": 340,
+    "fontSize": 52,
+    "highlightActiveWord": true,
+    "rtlLetterSpacing": "0px"
+  },
+  "visualNotes": [
+    "Deep forest green (#071A12) paired with vivid WhatsApp green (#25D366).",
+    "Prioritize WhatsApp notification card visual patterns and immediate response hooks.",
+    "Maintain 0px letter-spacing on all RTL Arabic captions and headers."
+  ]
+}

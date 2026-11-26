@@ -1,0 +1,26 @@
+{
+  "pacing": {
+    "style": "editorial",
+    "defaultFps": 60,
+    "minSceneSeconds": 1.0,
+    "breathingRoomSeconds": 0.5
+  },
+  "safeZones": {
+    "top": 220,
+    "bottom": 340,
+    "horizontal": 72
+  },
+  "transitionStyle": "fade-scale",
+  "captionStyle": {
+    "wordsPerChunk": 4,
+    "bottomOffset": 340,
+    "fontSize": 50,
+    "highlightActiveWord": true,
+    "rtlLetterSpacing": "0px"
+  },
+  "visualNotes": [
+    "Deep emerald (#071A12) with warm ivory (#F7F6F2) typography and restrained gold (#D4AF37) accents.",
+    "Refined editorial pacing; calm elegance without aggressive neon glows.",
+    "Vazirmatn primary with Cairo fallback; strictly 0px letter-spacing for Persian/Arabic ligatures."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Brand Template",
+  "dir": "rtl",
+  "fontFamily": "Cairo",
+  "bg": "#0B0F19",
+  "surface": "#131A2B",
+  "primary": "#10B981",
+  "accent": "#34D399",
+  "text": "#F8FAFC",
+  "mutedText": "#94A3B8",
+  "logoPath": "logos/logo.png",
+  "handle": "@brand"
+}

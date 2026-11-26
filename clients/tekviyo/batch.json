@@ -1,0 +1,76 @@
+{
+  "settings": {
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "skipExisting": true,
+    "defaultLanguage": "ar"
+  },
+  "videos": [
+    {
+      "id": "demo_001",
+      "enabled": true,
+      "title": "Tekviyo Cloud Automation Demo",
+      "caption": "تيكفيو تبني لك أنظمة أتمتة ذكية تعمل 24/7 في السحابة بدون تدخل يدوي. #Tekviyo #AI #Automation",
+      "audio": {
+        "voicePath": "audio/demo_001.wav",
+        "bgmPath": "audio/bgm.mp3",
+        "bgmVolume": 0.14,
+        "fallbackSeconds": 4
+      },
+      "captions": {
+        "enabled": true,
+        "language": "ar",
+        "wordsPerChunk": 4
+      },
+      "scenes": [
+        {
+          "type": "hook",
+          "weight": 1,
+          "badge": "هندسة الأتمتة السحابية",
+          "headline": "وداعاً للعمل اليدوي المتكرر",
+          "subtext": "أنظمة ذكية تدير عملياتك الرقمية بسرعة فائقة"
+        },
+        {
+          "type": "stat",
+          "weight": 1,
+          "value": 94,
+          "prefix": "+",
+          "suffix": "%",
+          "label": "توفير في وقت التشغيل الأسبوعي",
+          "sublabel": "قياس فعلي على خطوط الإنتاج السحابية"
+        },
+        {
+          "type": "ui_card",
+          "weight": 1,
+          "variant": "saas",
+          "appName": "Tekviyo Cloud Engine",
+          "timestamp": "مباشر",
+          "headerTitle": "تحديث حالة خط الإنتاج",
+          "items": [
+            {
+              "title": "مزامنة البيانات عبر السحابة",
+              "status": "مكتمل"
+            },
+            {
+              "title": "توليد التقارير والفيديوهات تلقائياً",
+              "status": "نشط"
+            },
+            {
+              "title": "إشعارات فورية لفريق التشغيل",
+              "status": "تم"
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "weight": 1,
+          "eyebrow": "تيكفيو | Tekviyo",
+          "headline": "انقل أعمالك إلى الجيل القادم",
+          "subtext": "احجز جلسة تحليل مجانية لعملياتك اليوم",
+          "ctaText": "ابدأ الأتمتة الآن"
+        }
+      ]
+    }
+  ]
+}

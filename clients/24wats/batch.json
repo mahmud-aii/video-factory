@@ -1,0 +1,75 @@
+{
+  "settings": {
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "skipExisting": true,
+    "defaultLanguage": "ar"
+  },
+  "videos": [
+    {
+      "id": "demo_001",
+      "enabled": true,
+      "title": "24Wats WhatsApp Automation Demo",
+      "caption": "رد فوري على عملائك عبر واتساب خلال ثوانٍ وبشكل آلي بالكامل مع 24Wats. #24Wats #WhatsAppAutomation",
+      "audio": {
+        "voicePath": "audio/demo_001.wav",
+        "bgmPath": "audio/bgm.mp3",
+        "bgmVolume": 0.14,
+        "fallbackSeconds": 4
+      },
+      "captions": {
+        "enabled": true,
+        "language": "ar",
+        "wordsPerChunk": 4
+      },
+      "scenes": [
+        {
+          "type": "hook",
+          "weight": 1,
+          "badge": "أتمتة واتساب الذكية",
+          "headline": "لا تخسر أي عميل بسبب تأخر الرد",
+          "subtext": "مساعد واتساب يعمل 24/7 ويحجز المواعيد تلقائياً"
+        },
+        {
+          "type": "ui_card",
+          "weight": 1,
+          "variant": "whatsapp",
+          "appName": "24Wats Bot",
+          "timestamp": "الآن",
+          "headerTitle": "محادثة عميل جديدة",
+          "items": [
+            {
+              "title": "الرد التلقائي خلال 2 ثانية",
+              "status": "مقروء"
+            },
+            {
+              "title": "إرسال قائمة الأسعار والباقات",
+              "status": "تم"
+            },
+            {
+              "title": "تأكيد الحجز وتحديث الـ CRM",
+              "status": "مؤكد"
+            }
+          ]
+        },
+        {
+          "type": "broll_text",
+          "weight": 1,
+          "videoPath": "broll/demo_001.mp4",
+          "tag": "مبيعات مستمرة",
+          "headline": "كل رسالة تتحول إلى فرصة بيع",
+          "subtext": "متابعة تلقائية ذكية بدون توقف"
+        },
+        {
+          "type": "cta",
+          "weight": 1,
+          "eyebrow": "24Wats",
+          "headline": "فعّل واتساب شركتك اليوم",
+          "subtext": "ربط رسمي سريع خلال أقل من 15 دقيقة",
+          "ctaText": "جرّب 24Wats الآن"
+        }
+      ]
+    }
+  ]
+}

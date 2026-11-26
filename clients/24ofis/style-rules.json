@@ -1,0 +1,26 @@
+{
+  "pacing": {
+    "style": "balanced",
+    "defaultFps": 60,
+    "minSceneSeconds": 1.0,
+    "breathingRoomSeconds": 0.5
+  },
+  "safeZones": {
+    "top": 220,
+    "bottom": 340,
+    "horizontal": 72
+  },
+  "transitionStyle": "slide-up",
+  "captionStyle": {
+    "wordsPerChunk": 4,
+    "bottomOffset": 340,
+    "fontSize": 52,
+    "highlightActiveWord": true,
+    "rtlLetterSpacing": "0px"
+  },
+  "visualNotes": [
+    "Executive navy (#0F172A) with authoritative amber (#F59E0B) callouts.",
+    "Structured Before/After comparisons and clear operational KPIs.",
+    "Strict RTL typography with zero letter-spacing and balanced whitespace."
+  ]
+}
