@@ -12,11 +12,13 @@ import {
 import { clientAsset, normalizeAssetPath } from '../lib/assets';
 import { getContrastInk, hexToRgba } from '../lib/color';
 import { MONO_FONT_FAMILY } from '../lib/fonts';
-import { formatBidiText, getSafeZones, rtlSafeTextStyle } from '../lib/rtl';
+import { containsRtlScript, formatBidiText, getSafeZones, rtlSafeTextStyle } from '../lib/rtl';
 import type {
+  BarChartScene,
   BrandConfig,
   BrollTextScene,
   ComparisonScene,
+  ComparisonSide,
   CtaScene,
   HookScene,
   ImageTextScene,
@@ -24,8 +26,10 @@ import type {
   SceneItem,
   StatScene,
   StyleRules,
+  TimelineStepsScene,
   UiCardItem,
   UiCardScene,
+  WhatsappChatScene,
 } from '../types';
 
 export type SceneRouterProps = {
@@ -37,12 +41,23 @@ export type SceneRouterProps = {
   durationInFrames: number;
 };
 
+type NormalizedComparisonSide = {
+  label: string;
+  title: string;
+  points: string[];
+};
+
 function getSpringConfig(styleRules?: StyleRules) {
-  const pacing = styleRules?.pacing?.style ?? 'snappy';
-  if (pacing === 'editorial') {
+  const rawPacing =
+    typeof styleRules?.pacing === 'string'
+      ? styleRules.pacing
+      : styleRules?.pacing?.style ?? 'snappy';
+  const pacing = rawPacing.toLowerCase();
+
+  if (pacing.includes('editorial') || pacing.includes('calm')) {
     return { damping: 22, stiffness: 130, mass: 0.85 };
   }
-  if (pacing === 'balanced') {
+  if (pacing.includes('balanced')) {
     return { damping: 18, stiffness: 170, mass: 0.75 };
   }
   return { damping: 16, stiffness: 220, mass: 0.65 };
@@ -71,6 +86,56 @@ function useEntrance(delayFrames: number, styleRules?: StyleRules) {
   });
 
   return { progress, opacity, transform: `translateY(${translateY}px) scale(${scale})` };
+}
+
+function sanitizeStringList(list?: unknown): string[] {
+  if (!Array.isArray(list)) {
+    return [];
+  }
+  return list
+    .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    .map((entry) => entry.trim());
+}
+
+function normalizeComparisonSide(
+  nested?: ComparisonSide,
+  flatLabel?: string,
+  flatTitle?: string,
+  flatPoints?: string[],
+  flatItems?: string[]
+): NormalizedComparisonSide {
+  const label = (nested?.label ?? flatLabel ?? '').trim();
+  const title = (nested?.title ?? flatTitle ?? '').trim();
+  const points = sanitizeStringList(
+    nested?.points ?? nested?.items ?? flatPoints ?? flatItems ?? []
+  );
+
+  return {
+    label,
+    title: title || label,
+    points,
+  };
+}
+
+function normalizeComparisonSides(scene: ComparisonScene): {
+  before: NormalizedComparisonSide;
+  after: NormalizedComparisonSide;
+} {
+  const before = normalizeComparisonSide(
+    scene?.before ?? scene?.left,
+    scene?.leftLabel,
+    scene?.leftTitle,
+    scene?.leftPoints,
+    scene?.leftItems
+  );
+  const after = normalizeComparisonSide(
+    scene?.after ?? scene?.right,
+    scene?.rightLabel,
+    scene?.rightTitle,
+    scene?.rightPoints,
+    scene?.rightItems
+  );
+  return { before, after };
 }
 
 const SafeStage: React.FC<{
@@ -111,52 +176,52 @@ const HookSceneView: React.FC<{
     extrapolateRight: 'clamp',
   });
 
-  const isRtl = brand.dir === 'rtl';
-
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: isRtl ? 'flex-start' : 'flex-start',
+          alignItems: 'flex-start',
           gap: 36,
         }}
       >
-        <div
-          style={{
-            opacity: badgeMotion.opacity,
-            transform: badgeMotion.transform,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: '14px 28px',
-            borderRadius: 999,
-            backgroundColor: hexToRgba(brand.primary, 0.14),
-            border: `1.5px solid ${hexToRgba(brand.primary, 0.55)}`,
-          }}
-        >
-          <span
+        {scene.badge ? (
+          <div
             style={{
-              width: 14,
-              height: 14,
+              opacity: badgeMotion.opacity,
+              transform: badgeMotion.transform,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 14,
+              padding: '14px 28px',
               borderRadius: 999,
-              backgroundColor: brand.primary,
-              boxShadow: `0 0 18px ${hexToRgba(brand.primary, 0.85)}`,
-              flexShrink: 0,
+              backgroundColor: hexToRgba(brand.primary, 0.14),
+              border: `1.5px solid ${hexToRgba(brand.primary, 0.55)}`,
             }}
-          />
-          <span
-            style={rtlSafeTextStyle(brand, {
-              fontSize: 32,
-              fontWeight: 700,
-              color: brand.accent,
-              lineHeight: 1.2,
-            })}
           >
-            {scene.badge}
-          </span>
-        </div>
+            <span
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: 999,
+                backgroundColor: brand.primary,
+                boxShadow: `0 0 18px ${hexToRgba(brand.primary, 0.85)}`,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={rtlSafeTextStyle(brand, {
+                fontSize: 32,
+                fontWeight: 700,
+                color: brand.accent,
+                lineHeight: 1.2,
+              })}
+            >
+              {scene.badge}
+            </span>
+          </div>
+        ) : null}
 
         <h1
           style={{
@@ -171,7 +236,7 @@ const HookSceneView: React.FC<{
             transform: headlineMotion.transform,
           }}
         >
-          {scene.headline}
+          {scene.headline ?? ''}
         </h1>
 
         <div
@@ -222,12 +287,20 @@ const StatSceneView: React.FC<{
     easing: Easing.out(Easing.cubic),
   });
 
-  const decimals = scene.decimals ?? (Number.isInteger(scene.value) ? 0 : 1);
-  const animatedValue = scene.value * progress;
+  const rawMetric = scene.value ?? scene.number ?? 0;
+  const safeMetric =
+    typeof rawMetric === 'number' && Number.isFinite(rawMetric) ? rawMetric : 0;
+
+  const decimals = scene.decimals ?? (Number.isInteger(safeMetric) ? 0 : 1);
+  const animatedValue = safeMetric * progress;
   const formattedNumber =
     decimals > 0
       ? animatedValue.toFixed(decimals)
       : Math.round(animatedValue).toLocaleString('en-US');
+
+  const suffixIsRtl = containsRtlScript(scene.suffix);
+  const prefixIsRtl = containsRtlScript(scene.prefix);
+  const hasRtlUnit = suffixIsRtl || prefixIsRtl;
 
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
@@ -265,47 +338,97 @@ const StatSceneView: React.FC<{
 
         <div
           style={{
-            direction: 'ltr',
+            direction: hasRtlUnit ? brand.dir : 'ltr',
             display: 'inline-flex',
+            flexWrap: 'wrap',
             alignItems: 'baseline',
             justifyContent: 'center',
-            gap: 8,
-            fontFamily: MONO_FONT_FAMILY,
-            fontVariantNumeric: 'tabular-nums',
-            fontSize: 168,
-            fontWeight: 800,
-            lineHeight: 1.05,
-            color: brand.primary,
-            letterSpacing: '-0.02em',
-            textShadow: `0 10px 42px ${hexToRgba(brand.primary, 0.32)}`,
+            gap: hasRtlUnit ? 18 : 8,
             zIndex: 1,
           }}
         >
           {scene.prefix ? (
-            <span style={{ fontSize: 108, color: brand.accent }}>{scene.prefix}</span>
+            <span
+              style={
+                prefixIsRtl
+                  ? rtlSafeTextStyle(brand, {
+                      fontSize: 80,
+                      fontWeight: 800,
+                      color: brand.accent,
+                      lineHeight: 1.15,
+                    })
+                  : {
+                      fontFamily: MONO_FONT_FAMILY,
+                      fontSize: 108,
+                      fontWeight: 800,
+                      color: brand.accent,
+                      lineHeight: 1.05,
+                    }
+              }
+            >
+              {scene.prefix}
+            </span>
           ) : null}
-          <span>{formattedNumber}</span>
+
+          <span
+            style={{
+              direction: 'ltr',
+              unicodeBidi: 'isolate',
+              fontFamily: MONO_FONT_FAMILY,
+              fontVariantNumeric: 'tabular-nums',
+              fontSize: 168,
+              fontWeight: 800,
+              lineHeight: 1.05,
+              color: brand.primary,
+              letterSpacing: '-0.02em',
+              textShadow: `0 10px 42px ${hexToRgba(brand.primary, 0.32)}`,
+            }}
+          >
+            {formattedNumber}
+          </span>
+
           {scene.suffix ? (
-            <span style={{ fontSize: 108, color: brand.accent }}>{scene.suffix}</span>
+            <span
+              style={
+                suffixIsRtl
+                  ? rtlSafeTextStyle(brand, {
+                      fontSize: 80,
+                      fontWeight: 800,
+                      color: brand.accent,
+                      lineHeight: 1.15,
+                    })
+                  : {
+                      fontFamily: MONO_FONT_FAMILY,
+                      fontSize: 108,
+                      fontWeight: 800,
+                      color: brand.accent,
+                      lineHeight: 1.05,
+                    }
+              }
+            >
+              {scene.suffix.trim()}
+            </span>
           ) : null}
         </div>
 
-        <div
-          style={{
-            ...rtlSafeTextStyle(brand, {
-              textAlign: 'center',
-              fontSize: 50,
-              fontWeight: 800,
-              color: brand.text,
-              lineHeight: 1.32,
-            }),
-            opacity: labelMotion.opacity,
-            transform: labelMotion.transform,
-            zIndex: 1,
-          }}
-        >
-          {scene.label}
-        </div>
+        {scene.label ? (
+          <div
+            style={{
+              ...rtlSafeTextStyle(brand, {
+                textAlign: 'center',
+                fontSize: 50,
+                fontWeight: 800,
+                color: brand.text,
+                lineHeight: 1.32,
+              }),
+              opacity: labelMotion.opacity,
+              transform: labelMotion.transform,
+              zIndex: 1,
+            }}
+          >
+            {scene.label}
+          </div>
+        ) : null}
 
         {scene.sublabel ? (
           <div
@@ -344,9 +467,8 @@ const BrollTextSceneView: React.FC<{
   const subMotion = useEntrance(12, styleRules);
 
   const normalizedVideoPath = scene.videoPath ? normalizeAssetPath(scene.videoPath) : '';
-  const hasValidVideo = Boolean(
-    normalizedVideoPath && resolvedAssets.validVideos.includes(normalizedVideoPath)
-  );
+  const validVideos = resolvedAssets?.validVideos ?? [];
+  const hasValidVideo = Boolean(normalizedVideoPath && validVideos.includes(normalizedVideoPath));
 
   const zoom = interpolate(frame, [0, Math.max(1, durationInFrames)], [1.0, 1.06], {
     extrapolateRight: 'clamp',
@@ -458,7 +580,7 @@ const BrollTextSceneView: React.FC<{
               transform: textMotion.transform,
             }}
           >
-            {scene.headline}
+            {scene.headline ?? ''}
           </h2>
 
           {scene.subtext ? (
@@ -498,9 +620,8 @@ const ImageTextSceneView: React.FC<{
   const subtextMotion = useEntrance(12, styleRules);
 
   const normalizedImagePath = scene.imagePath ? normalizeAssetPath(scene.imagePath) : '';
-  const hasValidImage = Boolean(
-    normalizedImagePath && resolvedAssets.validImages.includes(normalizedImagePath)
-  );
+  const validImages = resolvedAssets?.validImages ?? [];
+  const hasValidImage = Boolean(normalizedImagePath && validImages.includes(normalizedImagePath));
 
   const zoomMode = scene.zoom ?? 'in';
   const kenBurnsScale = interpolate(
@@ -618,7 +739,7 @@ const ImageTextSceneView: React.FC<{
               transform: headlineMotion.transform,
             }}
           >
-            {scene.headline}
+            {scene.headline ?? ''}
           </h2>
 
           {scene.subtext ? (
@@ -652,6 +773,10 @@ const ComparisonSceneView: React.FC<{
   const headerMotion = useEntrance(0, styleRules);
   const beforeMotion = useEntrance(5, styleRules);
   const afterMotion = useEntrance(13, styleRules);
+
+  const { before, after } = normalizeComparisonSides(scene);
+  const showBeforeBadge = Boolean(before.label && before.label !== before.title);
+  const showAfterBadge = Boolean(after.label && after.label !== after.title);
 
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
@@ -695,12 +820,12 @@ const ComparisonSceneView: React.FC<{
           </div>
         ) : null}
 
-        {/* BEFORE card */}
+        {/* BEFORE / LEFT card */}
         <div
           style={{
             opacity: beforeMotion.opacity,
             transform: beforeMotion.transform,
-            backgroundColor: hexToRgba(brand.surface, 0.82),
+            backgroundColor: hexToRgba(brand.surface, 0.86),
             border: `1.5px solid ${hexToRgba('#EF4444', 0.45)}`,
             borderRadius: 32,
             padding: '38px 42px',
@@ -709,38 +834,55 @@ const ComparisonSceneView: React.FC<{
             gap: 18,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span
-              style={{
-                ...rtlSafeTextStyle(brand, {
-                  fontSize: 28,
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            {showBeforeBadge ? (
+              <span
+                style={{
+                  ...rtlSafeTextStyle(brand, {
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: '#FCA5A5',
+                    lineHeight: 1.2,
+                  }),
+                  padding: '8px 20px',
+                  borderRadius: 999,
+                  backgroundColor: hexToRgba('#EF4444', 0.16),
+                }}
+              >
+                {before.label}
+              </span>
+            ) : (
+              <span
+                style={rtlSafeTextStyle(brand, {
+                  fontSize: 44,
                   fontWeight: 800,
-                  color: '#FCA5A5',
-                  lineHeight: 1.2,
-                }),
-                padding: '8px 20px',
-                borderRadius: 999,
-                backgroundColor: hexToRgba('#EF4444', 0.16),
-              }}
-            >
-              {scene.before.label}
+                  color: hexToRgba(brand.text, 0.92),
+                  lineHeight: 1.25,
+                })}
+              >
+                {before.title}
+              </span>
+            )}
+            <span style={{ fontSize: 30, color: '#F87171', fontWeight: 800, flexShrink: 0 }}>
+              ✕
             </span>
-            <span style={{ fontSize: 30, color: '#F87171', fontWeight: 800 }}>✕</span>
           </div>
 
-          <div
-            style={rtlSafeTextStyle(brand, {
-              fontSize: 44,
-              fontWeight: 800,
-              color: hexToRgba(brand.text, 0.9),
-              lineHeight: 1.25,
-            })}
-          >
-            {scene.before.title}
-          </div>
+          {showBeforeBadge && before.title ? (
+            <div
+              style={rtlSafeTextStyle(brand, {
+                fontSize: 44,
+                fontWeight: 800,
+                color: hexToRgba(brand.text, 0.9),
+                lineHeight: 1.25,
+              })}
+            >
+              {before.title}
+            </div>
+          ) : null}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {scene.before.points.map((point, idx) => (
+            {before.points.map((point, idx) => (
               <div
                 key={`before-${idx}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 16 }}
@@ -758,7 +900,7 @@ const ComparisonSceneView: React.FC<{
                   style={rtlSafeTextStyle(brand, {
                     fontSize: 33,
                     fontWeight: 500,
-                    color: brand.mutedText ?? hexToRgba(brand.text, 0.72),
+                    color: brand.mutedText ?? hexToRgba(brand.text, 0.78),
                     lineHeight: 1.38,
                   })}
                 >
@@ -769,7 +911,7 @@ const ComparisonSceneView: React.FC<{
           </div>
         </div>
 
-        {/* AFTER card */}
+        {/* AFTER / RIGHT card */}
         <div
           style={{
             opacity: afterMotion.opacity,
@@ -784,38 +926,55 @@ const ComparisonSceneView: React.FC<{
             boxShadow: `0 22px 64px ${hexToRgba(brand.primary, 0.22)}`,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span
-              style={{
-                ...rtlSafeTextStyle(brand, {
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: getContrastInk(brand.primary),
-                  lineHeight: 1.2,
-                }),
-                padding: '8px 22px',
-                borderRadius: 999,
-                backgroundColor: brand.primary,
-              }}
-            >
-              {scene.after.label}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            {showAfterBadge ? (
+              <span
+                style={{
+                  ...rtlSafeTextStyle(brand, {
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: getContrastInk(brand.primary),
+                    lineHeight: 1.2,
+                  }),
+                  padding: '8px 22px',
+                  borderRadius: 999,
+                  backgroundColor: brand.primary,
+                }}
+              >
+                {after.label}
+              </span>
+            ) : (
+              <span
+                style={rtlSafeTextStyle(brand, {
+                  fontSize: 46,
+                  fontWeight: 900,
+                  color: brand.text,
+                  lineHeight: 1.25,
+                })}
+              >
+                {after.title}
+              </span>
+            )}
+            <span style={{ fontSize: 34, color: brand.primary, fontWeight: 900, flexShrink: 0 }}>
+              ✓
             </span>
-            <span style={{ fontSize: 34, color: brand.primary, fontWeight: 900 }}>✓</span>
           </div>
 
-          <div
-            style={rtlSafeTextStyle(brand, {
-              fontSize: 46,
-              fontWeight: 900,
-              color: brand.text,
-              lineHeight: 1.25,
-            })}
-          >
-            {scene.after.title}
-          </div>
+          {showAfterBadge && after.title ? (
+            <div
+              style={rtlSafeTextStyle(brand, {
+                fontSize: 46,
+                fontWeight: 900,
+                color: brand.text,
+                lineHeight: 1.25,
+              })}
+            >
+              {after.title}
+            </div>
+          ) : null}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {scene.after.points.map((point, idx) => (
+            {after.points.map((point, idx) => (
               <div
                 key={`after-${idx}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 16 }}
@@ -860,7 +1019,11 @@ function normalizeUiCardItem(item: string | UiCardItem): UiCardItem {
   if (typeof item === 'string') {
     return { title: item };
   }
-  return item;
+  return {
+    title: item?.title ?? '',
+    detail: item?.detail,
+    status: item?.status,
+  };
 }
 
 const UiCardSceneView: React.FC<{
@@ -873,7 +1036,12 @@ const UiCardSceneView: React.FC<{
   const cardMotion = useEntrance(0, styleRules);
   const isWhatsapp = scene.variant === 'whatsapp';
 
-  const items = scene.items.map(normalizeUiCardItem);
+  const primaryHeader = (scene.appName ?? scene.title ?? brand.name ?? '').trim();
+  const secondaryHeader = (
+    scene.headerTitle ?? (scene.appName && scene.title ? scene.title : '')
+  ).trim();
+  const pillText = (scene.timestamp ?? scene.badge ?? '').trim();
+  const items = Array.isArray(scene.items) ? scene.items.map(normalizeUiCardItem) : [];
 
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
@@ -902,7 +1070,7 @@ const UiCardSceneView: React.FC<{
             gap: 20,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18, flex: 1, minWidth: 0 }}>
             <div
               style={{
                 width: 60,
@@ -921,31 +1089,35 @@ const UiCardSceneView: React.FC<{
             >
               {isWhatsapp ? 'WA' : '●'}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span
-                style={rtlSafeTextStyle(brand, {
-                  fontSize: 32,
-                  fontWeight: 800,
-                  color: brand.text,
-                  lineHeight: 1.2,
-                })}
-              >
-                {scene.appName}
-              </span>
-              <span
-                style={rtlSafeTextStyle(brand, {
-                  fontSize: 25,
-                  fontWeight: 600,
-                  color: brand.accent,
-                  lineHeight: 1.2,
-                })}
-              >
-                {scene.headerTitle}
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+              {primaryHeader ? (
+                <span
+                  style={rtlSafeTextStyle(brand, {
+                    fontSize: 34,
+                    fontWeight: 800,
+                    color: brand.text,
+                    lineHeight: 1.24,
+                  })}
+                >
+                  {primaryHeader}
+                </span>
+              ) : null}
+              {secondaryHeader ? (
+                <span
+                  style={rtlSafeTextStyle(brand, {
+                    fontSize: 25,
+                    fontWeight: 600,
+                    color: brand.accent,
+                    lineHeight: 1.2,
+                  })}
+                >
+                  {secondaryHeader}
+                </span>
+              ) : null}
             </div>
           </div>
 
-          {scene.timestamp ? (
+          {pillText ? (
             <span
               style={{
                 ...rtlSafeTextStyle(brand, {
@@ -961,7 +1133,7 @@ const UiCardSceneView: React.FC<{
                 flexShrink: 0,
               }}
             >
-              {scene.timestamp}
+              {pillText}
             </span>
           ) : null}
         </div>
@@ -1088,7 +1260,7 @@ const CtaSceneView: React.FC<{
   const pillMotion = useEntrance(12, styleRules);
 
   const pulse = 1 + Math.sin((frame / fps) * Math.PI * 2.2) * 0.025;
-  const showLogo = resolvedAssets.hasLogo && Boolean(brand.logoPath);
+  const showLogo = Boolean(resolvedAssets?.hasLogo && brand.logoPath);
 
   return (
     <SafeStage brand={brand} styleRules={styleRules}>
@@ -1158,7 +1330,7 @@ const CtaSceneView: React.FC<{
             transform: headlineMotion.transform,
           }}
         >
-          {scene.headline}
+          {scene.headline ?? ''}
         </h2>
 
         {scene.subtext ? (
@@ -1180,32 +1352,34 @@ const CtaSceneView: React.FC<{
           </p>
         ) : null}
 
-        <div
-          style={{
-            marginTop: 14,
-            opacity: pillMotion.opacity,
-            transform: `${pillMotion.transform} scale(${pulse})`,
-            padding: '28px 64px',
-            borderRadius: 999,
-            background: `linear-gradient(135deg, ${brand.primary}, ${brand.accent})`,
-            boxShadow: `0 20px 56px ${hexToRgba(brand.primary, 0.42)}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <span
-            style={rtlSafeTextStyle(brand, {
-              textAlign: 'center',
-              fontSize: 42,
-              fontWeight: 900,
-              color: getContrastInk(brand.primary),
-              lineHeight: 1.2,
-            })}
+        {scene.ctaText ? (
+          <div
+            style={{
+              marginTop: 14,
+              opacity: pillMotion.opacity,
+              transform: `${pillMotion.transform} scale(${pulse})`,
+              padding: '28px 64px',
+              borderRadius: 999,
+              background: `linear-gradient(135deg, ${brand.primary}, ${brand.accent})`,
+              boxShadow: `0 20px 56px ${hexToRgba(brand.primary, 0.42)}`,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            {scene.ctaText}
-          </span>
-        </div>
+            <span
+              style={rtlSafeTextStyle(brand, {
+                textAlign: 'center',
+                fontSize: 40,
+                fontWeight: 900,
+                color: getContrastInk(brand.primary),
+                lineHeight: 1.2,
+              })}
+            >
+              {scene.ctaText}
+            </span>
+          </div>
+        ) : null}
 
         {scene.footerText || brand.handle ? (
           (() => {
@@ -1236,81 +1410,675 @@ const CtaSceneView: React.FC<{
   );
 };
 
+const WhatsappChatSceneView: React.FC<{
+  scene: WhatsappChatScene;
+  brand: BrandConfig;
+  styleRules?: StyleRules;
+}> = ({ scene, brand, styleRules }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const cardMotion = useEntrance(0, styleRules);
+  const isRtl = brand.dir === 'rtl';
+  const botInk = getContrastInk(brand.primary);
+  const contactName = (scene.contactName ?? brand.name ?? '').trim();
+  const initialChar = (contactName.charAt(0) || 'W').toUpperCase();
+  const statusLabel = isRtl ? 'رد فوري نشط' : 'Instant Reply Active';
+  const messages = Array.isArray(scene.messages) ? scene.messages : [];
+
+  return (
+    <SafeStage brand={brand} styleRules={styleRules}>
+      <div
+        style={{
+          opacity: cardMotion.opacity,
+          transform: cardMotion.transform,
+          backgroundColor: hexToRgba(brand.surface, 0.96),
+          border: `2px solid ${hexToRgba(brand.primary, 0.42)}`,
+          borderRadius: 40,
+          overflow: 'hidden',
+          boxShadow: `0 32px 92px ${hexToRgba('#000000', 0.5)}`,
+        }}
+      >
+        <div
+          style={{
+            padding: '28px 36px',
+            backgroundColor: hexToRgba(brand.bg, 0.72),
+            borderBottom: `1.5px solid ${hexToRgba(brand.text, 0.09)}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 20,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 999,
+                backgroundColor: hexToRgba(brand.primary, 0.18),
+                border: `2px solid ${brand.primary}`,
+                color: brand.primary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: MONO_FONT_FAMILY,
+                fontSize: 30,
+                fontWeight: 800,
+                flexShrink: 0,
+              }}
+            >
+              {initialChar}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span
+                style={rtlSafeTextStyle(brand, {
+                  fontSize: 34,
+                  fontWeight: 800,
+                  color: brand.text,
+                  lineHeight: 1.2,
+                })}
+              >
+                {contactName}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    backgroundColor: brand.primary,
+                    boxShadow: `0 0 12px ${hexToRgba(brand.primary, 0.85)}`,
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={rtlSafeTextStyle(brand, {
+                    fontSize: 24,
+                    fontWeight: 600,
+                    color: brand.accent,
+                    lineHeight: 1.2,
+                  })}
+                >
+                  {statusLabel}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: '8px 18px',
+              borderRadius: 999,
+              backgroundColor: hexToRgba(brand.primary, 0.14),
+              border: `1px solid ${hexToRgba(brand.primary, 0.4)}`,
+              fontFamily: MONO_FONT_FAMILY,
+              fontSize: 22,
+              fontWeight: 700,
+              color: brand.primary,
+              direction: 'ltr',
+            }}
+          >
+            24/7
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: '34px 32px 42px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 22,
+            backgroundImage: `radial-gradient(${hexToRgba(brand.text, 0.04)} 1.5px, transparent 1.5px)`,
+            backgroundSize: '26px 26px',
+          }}
+        >
+          {messages.map((msg, idx) => {
+            const bubbleSpring = spring({
+              frame: Math.max(0, frame - (7 + idx * 10)),
+              fps,
+              config: getSpringConfig(styleRules),
+            });
+            const y = interpolate(bubbleSpring, [0, 1], [26, 0]);
+            const scale = interpolate(bubbleSpring, [0, 1], [0.95, 1]);
+            const opacity = interpolate(bubbleSpring, [0, 0.45, 1], [0, 0.92, 1], {
+              extrapolateRight: 'clamp',
+            });
+
+            const isBot = msg?.sender === 'bot';
+            const alignSelf = isBot ? 'flex-end' : 'flex-start';
+
+            const bubbleRadius = isBot
+              ? isRtl
+                ? '28px 28px 28px 10px'
+                : '28px 28px 10px 28px'
+              : isRtl
+                ? '28px 28px 10px 28px'
+                : '28px 28px 28px 10px';
+
+            return (
+              <div
+                key={`chat-msg-${idx}`}
+                style={{
+                  alignSelf,
+                  maxWidth: '86%',
+                  opacity,
+                  transform: `translateY(${y}px) scale(${scale})`,
+                  padding: '22px 26px 18px',
+                  borderRadius: bubbleRadius,
+                  backgroundColor: isBot ? brand.primary : hexToRgba(brand.bg, 0.9),
+                  border: isBot
+                    ? `1.5px solid ${hexToRgba(brand.accent, 0.7)}`
+                    : `1.5px solid ${hexToRgba(brand.text, 0.12)}`,
+                  boxShadow: isBot
+                    ? `0 16px 38px ${hexToRgba(brand.primary, 0.28)}`
+                    : `0 10px 26px ${hexToRgba('#000000', 0.28)}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                <span
+                  style={rtlSafeTextStyle(brand, {
+                    fontSize: 32,
+                    fontWeight: isBot ? 800 : 600,
+                    color: isBot ? botInk : brand.text,
+                    lineHeight: 1.42,
+                  })}
+                >
+                  {msg?.text ?? ''}
+                </span>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                    direction: 'ltr',
+                  }}
+                >
+                  {msg?.time ? (
+                    <span
+                      style={{
+                        fontFamily: MONO_FONT_FAMILY,
+                        fontSize: 20,
+                        fontWeight: 600,
+                        color: isBot
+                          ? hexToRgba(botInk, 0.72)
+                          : brand.mutedText ?? hexToRgba(brand.text, 0.6),
+                      }}
+                    >
+                      {msg.time}
+                    </span>
+                  ) : null}
+                  {isBot ? (
+                    <span
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 900,
+                        color: hexToRgba(botInk, 0.85),
+                      }}
+                    >
+                      ✓✓
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </SafeStage>
+  );
+};
+
+const BarChartSceneView: React.FC<{
+  scene: BarChartScene;
+  brand: BrandConfig;
+  styleRules?: StyleRules;
+}> = ({ scene, brand, styleRules }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const cardMotion = useEntrance(0, styleRules);
+  const titleMotion = useEntrance(4, styleRules);
+  const isRtl = brand.dir === 'rtl';
+
+  const bars = (Array.isArray(scene.bars) ? scene.bars : []).slice(0, 5);
+  const maxVal = Math.max(
+    1,
+    ...bars.map((b) => (typeof b?.value === 'number' && Number.isFinite(b.value) ? Math.max(0, b.value) : 0))
+  );
+
+  return (
+    <SafeStage brand={brand} styleRules={styleRules}>
+      <div
+        style={{
+          opacity: cardMotion.opacity,
+          transform: cardMotion.transform,
+          backgroundColor: hexToRgba(brand.surface, 0.94),
+          border: `1.5px solid ${hexToRgba(brand.primary, 0.36)}`,
+          borderRadius: 38,
+          padding: '50px 44px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 36,
+          boxShadow: `0 30px 84px ${hexToRgba('#000000', 0.45)}`,
+        }}
+      >
+        {scene.title ? (
+          <h2
+            style={{
+              ...rtlSafeTextStyle(brand, {
+                fontSize: 54,
+                fontWeight: 900,
+                color: brand.text,
+                lineHeight: 1.28,
+                margin: 0,
+              }),
+              opacity: titleMotion.opacity,
+              transform: titleMotion.transform,
+            }}
+          >
+            {scene.title}
+          </h2>
+        ) : null}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {bars.map((bar, idx) => {
+            const barSpring = spring({
+              frame: Math.max(0, frame - (8 + idx * 7)),
+              fps,
+              config: getSpringConfig(styleRules),
+            });
+            const safeVal =
+              typeof bar?.value === 'number' && Number.isFinite(bar.value)
+                ? Math.max(0, bar.value)
+                : 0;
+            const targetPct = Math.max(6, (safeVal / maxVal) * 100);
+            const widthPct = Math.max(0, Math.min(100, targetPct * barSpring));
+            const animatedDisplay =
+              bar?.displayValue ?? Math.round(safeVal * barSpring).toLocaleString('en-US');
+            const isHighlighted = Boolean(bar?.highlight);
+
+            return (
+              <div
+                key={`bar-${idx}`}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: 16,
+                  }}
+                >
+                  <span
+                    style={rtlSafeTextStyle(brand, {
+                      fontSize: 32,
+                      fontWeight: isHighlighted ? 800 : 600,
+                      color: isHighlighted
+                        ? brand.text
+                        : brand.mutedText ?? hexToRgba(brand.text, 0.78),
+                      lineHeight: 1.3,
+                    })}
+                  >
+                    {bar?.label ?? ''}
+                  </span>
+
+                  <span
+                    style={{
+                      direction: 'ltr',
+                      unicodeBidi: 'isolate',
+                      fontFamily: MONO_FONT_FAMILY,
+                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 34,
+                      fontWeight: 800,
+                      color: isHighlighted ? brand.primary : brand.text,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {animatedDisplay}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    height: 36,
+                    borderRadius: 999,
+                    backgroundColor: hexToRgba(brand.bg, 0.85),
+                    border: `1px solid ${hexToRgba(brand.text, 0.08)}`,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${widthPct}%`,
+                      height: '100%',
+                      borderRadius: 999,
+                      background: isHighlighted
+                        ? `linear-gradient(${isRtl ? '270deg' : '90deg'}, ${brand.primary}, ${
+                            brand.accent
+                          })`
+                        : hexToRgba(brand.text, 0.28),
+                      boxShadow: isHighlighted
+                        ? `0 0 24px ${hexToRgba(brand.primary, 0.45)}`
+                        : 'none',
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </SafeStage>
+  );
+};
+
+const TimelineStepsSceneView: React.FC<{
+  scene: TimelineStepsScene;
+  brand: BrandConfig;
+  styleRules?: StyleRules;
+}> = ({ scene, brand, styleRules }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const titleMotion = useEntrance(0, styleRules);
+  const isRtl = brand.dir === 'rtl';
+  const steps = Array.isArray(scene.steps) ? scene.steps : [];
+
+  const lineProgress = interpolate(frame, [4, 34], [0, 100], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  return (
+    <SafeStage brand={brand} styleRules={styleRules}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 38 }}>
+        {scene.title ? (
+          <h2
+            style={{
+              ...rtlSafeTextStyle(brand, {
+                fontSize: 58,
+                fontWeight: 900,
+                color: brand.text,
+                lineHeight: 1.26,
+                margin: 0,
+              }),
+              opacity: titleMotion.opacity,
+              transform: titleMotion.transform,
+            }}
+          >
+            {scene.title}
+          </h2>
+        ) : null}
+
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 28,
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 38,
+              bottom: 38,
+              ...(isRtl ? { right: 36 } : { left: 36 }),
+              width: 4,
+              borderRadius: 999,
+              backgroundColor: hexToRgba(brand.text, 0.12),
+              overflow: 'hidden',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: `${lineProgress}%`,
+                borderRadius: 999,
+                background: `linear-gradient(180deg, ${brand.primary}, ${brand.accent})`,
+                boxShadow: `0 0 18px ${hexToRgba(brand.primary, 0.55)}`,
+              }}
+            />
+          </div>
+
+          {steps.map((step, idx) => {
+            const stepSpring = spring({
+              frame: Math.max(0, frame - (6 + idx * 10)),
+              fps,
+              config: getSpringConfig(styleRules),
+            });
+            const translateY = interpolate(stepSpring, [0, 1], [30, 0]);
+            const opacity = interpolate(stepSpring, [0, 0.45, 1], [0, 0.92, 1], {
+              extrapolateRight: 'clamp',
+            });
+            const isFinalStep = idx === steps.length - 1;
+
+            return (
+              <div
+                key={`step-${idx}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 24,
+                  opacity,
+                  transform: `translateY(${translateY}px)`,
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                <div
+                  style={{
+                    width: 76,
+                    height: 76,
+                    borderRadius: 24,
+                    backgroundColor: isFinalStep ? brand.primary : brand.surface,
+                    border: `2px solid ${brand.primary}`,
+                    color: isFinalStep ? getContrastInk(brand.primary) : brand.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: MONO_FONT_FAMILY,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontSize: 30,
+                    fontWeight: 800,
+                    direction: 'ltr',
+                    boxShadow: isFinalStep
+                      ? `0 12px 32px ${hexToRgba(brand.primary, 0.35)}`
+                      : `0 10px 24px ${hexToRgba('#000000', 0.32)}`,
+                    flexShrink: 0,
+                  }}
+                >
+                  {step?.number ?? String(idx + 1).padStart(2, '0')}
+                </div>
+
+                <div
+                  style={{
+                    flex: 1,
+                    padding: '28px 32px',
+                    borderRadius: 28,
+                    backgroundColor: hexToRgba(brand.surface, 0.94),
+                    border: `1.5px solid ${hexToRgba(
+                      brand.primary,
+                      isFinalStep ? 0.55 : 0.24
+                    )}`,
+                    boxShadow: `0 18px 46px ${hexToRgba('#000000', 0.32)}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10,
+                  }}
+                >
+                  <span
+                    style={rtlSafeTextStyle(brand, {
+                      fontSize: 38,
+                      fontWeight: 800,
+                      color: brand.text,
+                      lineHeight: 1.3,
+                    })}
+                  >
+                    {step?.title ?? ''}
+                  </span>
+
+                  {step?.subtitle ? (
+                    <span
+                      style={rtlSafeTextStyle(brand, {
+                        fontSize: 28,
+                        fontWeight: 500,
+                        color: brand.mutedText ?? hexToRgba(brand.text, 0.74),
+                        lineHeight: 1.42,
+                      })}
+                    >
+                      {step.subtitle}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </SafeStage>
+  );
+};
+
 function formatSceneForBidi(scene: SceneItem, dir: BrandConfig['dir']): SceneItem {
-  if (dir !== 'rtl') {
+  if (!scene || dir !== 'rtl') {
     return scene;
   }
-  const f = (value: string) => formatBidiText(value, dir);
-  const fo = (value?: string) => (value ? formatBidiText(value, dir) : value);
+
+  const f = (value?: string): string =>
+    typeof value === 'string' ? formatBidiText(value, dir) : '';
+  const fo = (value?: string): string | undefined =>
+    typeof value === 'string' ? formatBidiText(value, dir) : undefined;
+  const fl = (values?: string[]): string[] =>
+    Array.isArray(values)
+      ? values
+          .filter((entry): entry is string => typeof entry === 'string')
+          .map((entry) => formatBidiText(entry, dir))
+      : [];
 
   switch (scene.type) {
     case 'hook':
       return {
         ...scene,
-        badge: f(scene.badge),
-        headline: f(scene.headline),
-        subtext: fo(scene.subtext),
+        badge: fo(scene?.badge),
+        headline: f(scene?.headline),
+        subtext: fo(scene?.subtext),
       };
     case 'stat':
       return {
         ...scene,
-        label: f(scene.label),
-        sublabel: fo(scene.sublabel),
+        prefix: fo(scene?.prefix),
+        suffix: fo(scene?.suffix),
+        label: f(scene?.label),
+        sublabel: fo(scene?.sublabel),
       };
     case 'broll_text':
       return {
         ...scene,
-        tag: fo(scene.tag),
-        headline: f(scene.headline),
-        subtext: fo(scene.subtext),
+        tag: fo(scene?.tag),
+        headline: f(scene?.headline),
+        subtext: fo(scene?.subtext),
       };
     case 'image_text':
       return {
         ...scene,
-        tag: fo(scene.tag),
-        headline: f(scene.headline),
-        subtext: fo(scene.subtext),
+        tag: fo(scene?.tag),
+        headline: f(scene?.headline),
+        subtext: fo(scene?.subtext),
       };
-    case 'comparison':
+    case 'comparison': {
+      const { before, after } = normalizeComparisonSides(scene);
       return {
         ...scene,
-        eyebrow: fo(scene.eyebrow),
-        headline: fo(scene.headline),
+        eyebrow: fo(scene?.eyebrow),
+        headline: fo(scene?.headline),
         before: {
-          label: f(scene.before.label),
-          title: f(scene.before.title),
-          points: scene.before.points.map(f),
+          label: f(before?.label),
+          title: f(before?.title),
+          points: fl(before?.points),
         },
         after: {
-          label: f(scene.after.label),
-          title: f(scene.after.title),
-          points: scene.after.points.map(f),
+          label: f(after?.label),
+          title: f(after?.title),
+          points: fl(after?.points),
         },
       };
+    }
     case 'ui_card':
       return {
         ...scene,
-        appName: f(scene.appName),
-        timestamp: fo(scene.timestamp),
-        headerTitle: f(scene.headerTitle),
-        items: scene.items.map((item) =>
-          typeof item === 'string'
-            ? f(item)
-            : {
-                title: f(item.title),
-                detail: fo(item.detail),
-                status: fo(item.status),
-              }
-        ),
+        appName: fo(scene?.appName),
+        title: fo(scene?.title),
+        badge: fo(scene?.badge),
+        timestamp: fo(scene?.timestamp),
+        headerTitle: fo(scene?.headerTitle),
+        items: Array.isArray(scene?.items)
+          ? scene.items.map((item) =>
+              typeof item === 'string'
+                ? f(item)
+                : {
+                    title: f(item?.title),
+                    detail: fo(item?.detail),
+                    status: fo(item?.status),
+                  }
+            )
+          : [],
+      };
+    case 'whatsapp_chat':
+      return {
+        ...scene,
+        contactName: fo(scene?.contactName),
+        messages: Array.isArray(scene?.messages)
+          ? scene.messages.map((msg) => ({
+              sender: msg?.sender === 'bot' ? 'bot' : 'client',
+              text: f(msg?.text),
+              time: msg?.time,
+            }))
+          : [],
+      };
+    case 'bar_chart':
+      return {
+        ...scene,
+        title: fo(scene?.title),
+        bars: Array.isArray(scene?.bars)
+          ? scene.bars.map((bar) => ({
+              ...bar,
+              label: f(bar?.label),
+            }))
+          : [],
+      };
+    case 'timeline_steps':
+      return {
+        ...scene,
+        title: fo(scene?.title),
+        steps: Array.isArray(scene?.steps)
+          ? scene.steps.map((step) => ({
+              ...step,
+              number: step?.number ?? '',
+              title: f(step?.title),
+              subtitle: fo(step?.subtitle),
+            }))
+          : [],
       };
     case 'cta':
       return {
         ...scene,
-        eyebrow: fo(scene.eyebrow),
-        headline: f(scene.headline),
-        subtext: fo(scene.subtext),
-        ctaText: f(scene.ctaText),
-        footerText: fo(scene.footerText),
+        eyebrow: fo(scene?.eyebrow),
+        headline: f(scene?.headline),
+        subtext: fo(scene?.subtext),
+        ctaText: f(scene?.ctaText),
+        footerText: fo(scene?.footerText),
       };
     default: {
       const exhaustiveCheck: never = scene;
@@ -1367,6 +2135,12 @@ export const SceneRouter: React.FC<SceneRouterProps> = ({
       return <ComparisonSceneView scene={scene} brand={brand} styleRules={styleRules} />;
     case 'ui_card':
       return <UiCardSceneView scene={scene} brand={brand} styleRules={styleRules} />;
+    case 'whatsapp_chat':
+      return <WhatsappChatSceneView scene={scene} brand={brand} styleRules={styleRules} />;
+    case 'bar_chart':
+      return <BarChartSceneView scene={scene} brand={brand} styleRules={styleRules} />;
+    case 'timeline_steps':
+      return <TimelineStepsSceneView scene={scene} brand={brand} styleRules={styleRules} />;
     case 'cta':
       return (
         <CtaSceneView

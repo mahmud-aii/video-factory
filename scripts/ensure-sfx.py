@@ -112,13 +112,13 @@ def write_stereo_wav(wav_path: Path, left: array.array, right: array.array, targ
         wf.writeframes(pcm)
 
 
-def synthesize_ambient_bgm_wav(wav_path: Path, duration_sec: float = 35.0) -> None:
+def synthesize_ambient_bgm_wav(wav_path: Path, duration_sec: float = 48.0) -> None:
     """
-    Synthesizes a warm, calm, institutional ambient chord pad:
-      - 35.0s stereo, 44.1 kHz
-      - Seamless loop via 1.2s equal-power overlap-add crossfade
+    Synthesizes a subtle, calm corporate ambient chord pad:
+      - 48.0s stereo, 44.1 kHz
       - Low-passed strictly < 900 Hz (2-pole cascaded IIR at 780 Hz)
-      - Gentle subtle breath pulse (3.5s cycle = 10 exact cycles in 35s)
+      - Gentle subtle breath pulse (4.0s cycle = 12 exact cycles in 48s)
+      - Seamless loop crossfade + smooth fade-in (0.8s) and fade-out (1.2s)
       - Peak-normalized cleanly to -3 dBFS (~0.70)
     """
     sr = SAMPLE_RATE
@@ -155,11 +155,11 @@ def synthesize_ambient_bgm_wav(wav_path: Path, duration_sec: float = 35.0) -> No
     p_d4_l = p_d4_r = 0.0
     p_fs4_l = p_fs4_r = 0.0
 
-    # Exact integer cycles across 35.0s for seamless looping:
-    # - Chord morph: 2 cycles in 35s (17.5s each)
-    # - Calm breath pulse: 10 cycles in 35s (3.5s each)
-    i_morph = (2.0 / duration_sec) * f2i
-    i_pulse = (10.0 / duration_sec) * f2i
+    # Exact integer cycles across 48.0s:
+    # - Chord morph: 3 cycles in 48s (16.0s each)
+    # - Calm breath pulse: 12 cycles in 48s (4.0s each)
+    i_morph = (3.0 / duration_sec) * f2i
+    i_pulse = (12.0 / duration_sec) * f2i
     p_morph = 0.0
     p_pulse = 0.0
 
@@ -235,6 +235,21 @@ def synthesize_ambient_bgm_wav(wav_path: Path, duration_sec: float = 35.0) -> No
         ti = out_samples + i
         loop_l[i] = loop_l[i] * fi + raw_l[ti] * fo
         loop_r[i] = loop_r[i] * fi + raw_r[ti] * fo
+
+    # Smooth fade-in (0.8s) and fade-out (1.2s) for clean start & end transitions
+    fade_in_samples = min(int(round(0.8 * sr)), out_samples // 4)
+    for i in range(fade_in_samples):
+        env = math.sin((i / float(fade_in_samples)) * half_pi)
+        loop_l[i] *= env
+        loop_r[i] *= env
+
+    fade_out_samples = min(int(round(1.2 * sr)), out_samples // 4)
+    fade_out_start = out_samples - fade_out_samples
+    for i in range(fade_out_samples):
+        env = math.cos((i / float(fade_out_samples)) * half_pi)
+        idx = fade_out_start + i
+        loop_l[idx] *= env
+        loop_r[idx] *= env
 
     write_stereo_wav(wav_path, loop_l, loop_r, target_peak=0.70)
 
@@ -351,7 +366,7 @@ def ensure_audio_file(
 
     try:
         if kind == "bgm":
-            synthesize_ambient_bgm_wav(tmp_wav, duration_sec=35.0)
+            synthesize_ambient_bgm_wav(tmp_wav, duration_sec=48.0)
         elif kind == "transition_sfx":
             synthesize_whoosh_wav(tmp_wav, duration_sec=0.28)
         else:

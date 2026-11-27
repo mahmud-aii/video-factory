@@ -121,12 +121,16 @@ export function loadCaptionWords(slug, videoId) {
 }
 
 export function buildInputProps(slug, workspace, job) {
-  const resolvedAssets = resolveClientAssets(slug, workspace.brand, job);
+  const effectiveBrand =
+    job && job.brandOverride && typeof job.brandOverride === 'object'
+      ? { ...workspace.brand, ...job.brandOverride }
+      : workspace.brand;
+  const resolvedAssets = resolveClientAssets(slug, effectiveBrand, job);
   const captionWords = loadCaptionWords(slug, job.id);
 
   return {
     brandSlug: slug,
-    brand: workspace.brand,
+    brand: effectiveBrand,
     styleRules: workspace.styleRules,
     job,
     resolvedAssets,

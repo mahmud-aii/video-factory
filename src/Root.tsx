@@ -42,10 +42,14 @@ const calculateMetadata: CalculateMetadataFunction<FactoryVideoProps> = async ({
       ? props.job.audio.fallbackSeconds
       : DEFAULT_FALLBACK_SECONDS;
 
+  const pacingObj =
+    props.styleRules?.pacing && typeof props.styleRules.pacing === 'object'
+      ? props.styleRules.pacing
+      : undefined;
   const breathingRoom =
-    typeof props.styleRules?.pacing?.breathingRoomSeconds === 'number' &&
-    props.styleRules.pacing.breathingRoomSeconds >= 0
-      ? props.styleRules.pacing.breathingRoomSeconds
+    typeof pacingObj?.breathingRoomSeconds === 'number' &&
+    pacingObj.breathingRoomSeconds >= 0
+      ? pacingObj.breathingRoomSeconds
       : DEFAULT_BREATHING_ROOM_SECONDS;
 
   let totalSeconds = fallbackSeconds;
