@@ -8,6 +8,7 @@ import {
   COMPOSITION_ID,
   ENTRY_POINT,
   buildInputProps,
+  ensureProceduralSfx,
   getOutputPaths,
   loadClientWorkspace,
   resolveBrowserExecutable,
@@ -85,6 +86,7 @@ async function main() {
     try {
       console.log(`\n[RENDER] ${key}`);
       fs.mkdirSync(dir, { recursive: true });
+      ensureProceduralSfx(slug, job.id);
       const inputProps = buildInputProps(slug, workspace, job);
       console.log(
         `  Assets: logo=${inputProps.resolvedAssets.hasLogo}, voice=${inputProps.resolvedAssets.hasVoice}, bgm=${inputProps.resolvedAssets.hasBgm}, transitionSfx=${inputProps.resolvedAssets.hasTransitionSfx}, validVideos=${inputProps.resolvedAssets.validVideos.length}, validImages=${inputProps.resolvedAssets.validImages.length}`
