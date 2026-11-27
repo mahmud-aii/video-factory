@@ -7,6 +7,7 @@ import {
   COMPOSITION_ID,
   ENTRY_POINT,
   buildInputProps,
+  ensureProceduralSfx,
   getOutputPaths,
   loadClientWorkspace,
   resolveBrowserExecutable,
@@ -32,6 +33,7 @@ async function main() {
     throw new Error(`Video job "${videoId}" not found in clients/${slug}/batch.json`);
   }
 
+  ensureProceduralSfx(slug, videoId);
   const inputProps = buildInputProps(slug, workspace, job);
   const { dir, videoPath } = getOutputPaths(slug, videoId);
   fs.mkdirSync(dir, { recursive: true });

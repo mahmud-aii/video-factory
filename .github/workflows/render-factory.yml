@@ -104,6 +104,10 @@ jobs:
         run: |
           rclone copy "gdrive:Video-Factory/clients/${SLUG}" "./clients/${SLUG}" --exclude "*.json" || true
 
+      - name: Ensure fallback procedural BGM and transition SFX
+        if: env.SKIP_VIDEO != 'true'
+        run: python3 scripts/ensure-sfx.py "${{ matrix.slug }}" "${{ matrix.videoId }}"
+
       - name: Check whether Faster-Whisper transcription is required
         id: whisper_check
         if: env.SKIP_VIDEO != 'true'

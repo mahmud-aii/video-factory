@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +10,7 @@ export const ROOT_DIR = path.resolve(__dirname, '..', '..');
 export const CLIENTS_DIR = path.resolve(ROOT_DIR, 'clients');
 export const OUTPUT_DIR = path.resolve(ROOT_DIR, 'output');
 export const ENTRY_POINT = path.resolve(ROOT_DIR, 'src/index.ts');
+export const ENSURE_SFX_SCRIPT = path.resolve(ROOT_DIR, 'scripts/ensure-sfx.py');
 export const COMPOSITION_ID = 'FactoryReel';
 
 export function normalizeAssetPath(relativePath) {
@@ -154,4 +156,31 @@ export function resolveBrowserExecutable() {
     return process.env.REMOTION_BROWSER_EXECUTABLE;
   }
   return undefined;
+}
+
+/**
+ * Ensures requested bgmPath and transitionSfxPath exist on disk by invoking
+ * `python3 scripts/ensure-sfx.py <slug> <videoId>` before asset detection.
+ * Existing files (e.g. pulled from Google Drive) are never overwritten.
+ */
+export function ensureProceduralSfx(slug, videoId) {
+  if (!fs.existsSync(ENSURE_SFX_SCRIPT)) {
+    return;
+  }
+
+  const pythonBin = process.platform === 'win32' ? 'python' : 'python3';
+  try {
+    execFileSync(pythonBin, [ENSURE_SFX_SCRIPT, slug, videoId], {
+      cwd: ROOT_DIR,
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    if (err && typeof err === 'object' && err.code === 'ENOENT') {
+      console.warn(
+        `Warning: ${pythonBin} not found on PATH; skipping procedural fallback audio synthesis.`
+      );
+      return;
+    }
+    throw err;
+  }
 }

@@ -41,6 +41,7 @@ video-factory/
 │   ├── render-one.mjs            # Single-video Remotion cloud renderer + .txt caption sidecar
 │   ├── night-factory.mjs         # Sequential local/fallback batch runner (bundles once)
 │   ├── transcribe.py             # Standalone Faster-Whisper (small, cpu, int8) word timestamps
+│   ├── ensure-sfx.py             # Procedural fallback ambient BGM & transition whoosh synthesizer (stdlib + ffmpeg)
 │   └── lib/factory-utils.mjs     # Shared workspace, resolvedAssets (validVideos/validImages/hasTransitionSfx), and captions
 ├── .github/workflows/
 │   └── render-factory.yml        # Parallel Matrix GitHub Actions pipeline (max-parallel: 5)
