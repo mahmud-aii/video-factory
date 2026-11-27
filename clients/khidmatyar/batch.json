@@ -4,58 +4,86 @@
     "width": 1080,
     "height": 1920,
     "skipExisting": true,
-    "defaultLanguage": "fa"
+    "concurrency": 2
   },
   "videos": [
     {
-      "id": "demo_001",
-      "enabled": false,
-      "title": "KHIDMATYAR Trusted Services Demo",
-      "caption": "خدمت يار | KHIDMATYAR؛ همراه مطمئن شما برای دریافت خدمات حرفه‌ای، شفاف و سریع. #KHIDMATYAR #خدمت_يار",
-      "audio": {
-        "voicePath": "audio/demo_001.wav",
-        "bgmPath": "audio/bgm.mp3",
-        "bgmVolume": 0.12,
-        "transitionSfxPath": "sfx/whoosh.mp3",
-        "fallbackSeconds": 4
-      },
+      "id": "reel_01_dari_launch",
+      "enabled": true,
+      "brandOverride": {},
       "captions": {
         "enabled": true,
-        "language": "fa",
-        "wordsPerChunk": 4
+        "language": "fa"
       },
+      "audio": {
+        "voicePath": "audio/vid_01_fa.wav",
+        "bgmPath": "sfx/bgm_corporate.mp3",
+        "bgmVolume": 0.08,
+        "transitionSfxPath": "sfx/whoosh.mp3",
+        "fallbackSeconds": 30
+      },
+      "caption": "یافتن شفاخانه، پوهنتون یا شرکت معتبر در افغانستان دیگر دشوار نیست.\nپه افغانستان کې د باوري روغتون، پوهنتون یا شرکت موندل نور ستونزمن نه دي.\n\nخدمت يار — راهنمای ملی نهادهای معتبر در ۳۴ ولایت، ۱۲ بخش حیاتی و ۵ زبان، با بیش از ۲۴۰ نهاد تأییدشده که هر روز در حال افزایش است.\n\n🌐 https://khidmatyar.com\n📲 WhatsApp: +93 76 584 3613\n\n#خدمت_يار #Khidmatyar #افغانستان #کابل #خدمات_معتبر",
       "scenes": [
         {
           "type": "hook",
-          "weight": 1,
-          "badge": "خدمات مطمئن و حرفه‌ای",
-          "headline": "کیفیت، شفافیت و آرامش خاطر",
-          "subtext": "دسترسی آسان به متخصصان تأییدشده در کمترین زمان"
+          "weight": 14,
+          "badge": "افغانستان • اعتماد ملی",
+          "headline": "یافتن نهاد معتبر نباید دشوار باشد",
+          "subtext": "شفاخانه، پوهنتون یا شرکت مطمئن در چند ثانیه"
         },
         {
-          "type": "broll_text",
-          "weight": 1,
-          "videoPath": "broll/demo_001.mp4",
-          "tag": "استاندارد خدمت يار",
-          "headline": "هر خدمت با پیگیری دقیق و ضمانت کیفیت",
-          "subtext": "از ثبت درخواست تا تحویل کامل در کنار شما هستیم"
+          "type": "comparison",
+          "weight": 16,
+          "leftTitle": "جستجوی قدیمی",
+          "leftPoints": [
+            "شماره‌های خاموش و قدیمی",
+            "آدرس‌های نامشخص و بی‌نتیجه"
+          ],
+          "rightTitle": "پورتال خدمت يار",
+          "rightPoints": [
+            "اطلاعات رسمی و تأییدشده",
+            "تماس مستقیم و فعال ۲۴/۷"
+          ]
+        },
+        {
+          "type": "image_text",
+          "weight": 16,
+          "imagePath": "images/flow-02-launch-hero.png",
+          "zoom": "in",
+          "headline": "به خدمت يار خوش آمدید",
+          "subtext": "راهنمای ملی نهادهای معتبر افغانستان"
         },
         {
           "type": "stat",
-          "weight": 1,
-          "value": 98,
-          "prefix": "",
-          "suffix": "%",
-          "label": "رضایت مشتریان از خدمات انجام‌شده",
-          "sublabel": "بر اساس ارزیابی واقعی درخواست‌های تکمیل‌شده"
+          "weight": 15,
+          "number": 34,
+          "suffix": " ولایت",
+          "label": "پوشش سراسری در ۱۲ بخش حیاتی کشور"
+        },
+        {
+          "type": "ui_card",
+          "weight": 15,
+          "title": "نهادهای تأییدشده در حال رشد",
+          "badge": "+240 • هر روز بیشتر",
+          "items": [
+            "آدرس دقیق و شماره تماس فعال",
+            "پشتیبانی از ۵ زبان (دری، پشتو، عربی، ترکی، انگلیسی)",
+            "ثبت رسمی و رایگان برای نهادهای معتبر"
+          ]
+        },
+        {
+          "type": "image_text",
+          "weight": 12,
+          "imagePath": "images/flow-m01-kabul-capital.jpg",
+          "zoom": "out",
+          "headline": "پلی میان مردم و خدمات مطمئن",
+          "subtext": "خدمت پیدا کنید یا نهاد خود را ثبت نمایید"
         },
         {
           "type": "cta",
-          "weight": 1,
-          "eyebrow": "خدمت يار | KHIDMATYAR",
-          "headline": "همین امروز درخواست خود را ثبت کنید",
-          "subtext": "پشتیبانی منظم و پاسخ‌گویی شفاف در هر مرحله",
-          "ctaText": "ثبت درخواست خدمت"
+          "weight": 12,
+          "headline": "اعتماد از همین‌جا آغاز می‌شود",
+          "ctaText": "khidmatyar.com | +93 76 584 3613"
         }
       ]
     }
