@@ -1,28 +1,9 @@
 {
-  "pacing": {
-    "style": "editorial",
-    "defaultFps": 60,
-    "minSceneSeconds": 1.0,
-    "breathingRoomSeconds": 0.5
-  },
-  "safeZones": {
-    "top": 220,
-    "bottom": 340,
-    "horizontal": 72
-  },
-  "transitionStyle": "fade-scale",
-  "captionStyle": {
-    "wordsPerChunk": 4,
-    "bottomOffset": 340,
-    "fontSize": 50,
-    "highlightActiveWord": true,
-    "rtlLetterSpacing": "0px"
-  },
-  "accentMaxUsagePercent": 5,
-  "visualNotes": [
-    "Brand identity: خدمت يار | KHIDMATYAR (@khidmatyar) — trusted, dignified service identity.",
-    "Color hierarchy: deep emerald (#071A12) primary canvas, warm ivory (#F7F6F2) typography, and restrained gold (#D4AF37) strictly capped at <=5% of total frame area (hairline accents, active caption word, subtle badges/CTA).",
-    "Never flood backgrounds or large surfaces with gold; preserve calm editorial restraint without neon glare.",
-    "Typography: Vazirmatn, Cairo, sans-serif with strictly 0px letter-spacing on all RTL Arabic/Persian text."
-  ]
+  "pacing": "fast-kinetic",
+  "maxWordsPerHeadline": 8,
+  "safeZones": { "topPx": 220, "bottomPx": 340, "horizontalPx": 64 },
+  "rtlRules": { "letterSpacing": "0px", "noIconRotation": true },
+  "captionStyle": { "wordsPerChunk": 3, "bottomOffset": 340 },
+  "visualCompliance": "Modest Afghan cultural framing, zero tattoos, zero neon glow, zero system emojis, clean dark negative space in center",
+  "brandSpecificNotes": "Unified spelling خدمت يار. Gold <= 5% frame area. 34 Afghan provinces. Maintain Pashto/Dari balance."
 }
