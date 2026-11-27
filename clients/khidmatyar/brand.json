@@ -1,13 +1,12 @@
 {
   "name": "خدمت يار | KHIDMATYAR",
+  "handle": "@khidmatyar",
   "dir": "rtl",
   "fontFamily": "Vazirmatn, Cairo, sans-serif",
   "bg": "#071A12",
-  "surface": "#0F291E",
+  "surface": "#0A1F17",
   "primary": "#D4AF37",
-  "accent": "#E6C76A",
+  "accent": "#10B981",
   "text": "#F7F6F2",
-  "mutedText": "#CBD5C0",
-  "logoPath": "logos/logo.png",
-  "handle": "@khidmatyar"
+  "logoPath": "logos/logo.png"
 }
