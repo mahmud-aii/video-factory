@@ -14,28 +14,42 @@ export type BrandConfig = {
   handle?: string;
 };
 
+export type StylePacingConfig = {
+  style?: 'snappy' | 'balanced' | 'editorial' | string;
+  defaultFps?: number;
+  minSceneSeconds?: number;
+  breathingRoomSeconds?: number;
+};
+
+export type StyleSafeZonesConfig = {
+  top?: number;
+  bottom?: number;
+  horizontal?: number;
+  topPx?: number;
+  bottomPx?: number;
+  horizontalPx?: number;
+};
+
 export type StyleRules = {
-  pacing: {
-    style: 'snappy' | 'balanced' | 'editorial';
-    defaultFps: number;
-    minSceneSeconds: number;
-    breathingRoomSeconds: number;
+  pacing?: string | StylePacingConfig;
+  maxWordsPerHeadline?: number;
+  safeZones?: StyleSafeZonesConfig;
+  transitionStyle?: 'spring-cut' | 'slide-up' | 'fade-scale';
+  rtlRules?: {
+    letterSpacing?: string;
+    noIconRotation?: boolean;
   };
-  safeZones: {
-    top: number;
-    bottom: number;
-    horizontal: number;
-  };
-  transitionStyle: 'spring-cut' | 'slide-up' | 'fade-scale';
-  captionStyle: {
-    wordsPerChunk: number;
-    bottomOffset: number;
-    fontSize: number;
-    highlightActiveWord: boolean;
-    rtlLetterSpacing: '0px';
+  captionStyle?: {
+    wordsPerChunk?: number;
+    bottomOffset?: number;
+    fontSize?: number;
+    highlightActiveWord?: boolean;
+    rtlLetterSpacing?: '0px';
   };
   accentMaxUsagePercent?: number;
-  visualNotes: string[];
+  visualNotes?: string[];
+  visualCompliance?: string;
+  brandSpecificNotes?: string;
 };
 
 export type CaptionWord = {
@@ -65,14 +79,15 @@ export type BaseScene = {
 
 export type HookScene = BaseScene & {
   type: 'hook';
-  badge: string;
+  badge?: string;
   headline: string;
   subtext?: string;
 };
 
 export type StatScene = BaseScene & {
   type: 'stat';
-  value: number;
+  value?: number;
+  number?: number;
   prefix?: string;
   suffix?: string;
   decimals?: number;
@@ -100,17 +115,28 @@ export type ImageTextScene = BaseScene & {
 };
 
 export type ComparisonSide = {
-  label: string;
-  title: string;
-  points: string[];
+  label?: string;
+  title?: string;
+  points?: string[];
+  items?: string[];
 };
 
 export type ComparisonScene = BaseScene & {
   type: 'comparison';
   eyebrow?: string;
   headline?: string;
-  before: ComparisonSide;
-  after: ComparisonSide;
+  before?: ComparisonSide;
+  after?: ComparisonSide;
+  left?: ComparisonSide;
+  right?: ComparisonSide;
+  leftLabel?: string;
+  leftTitle?: string;
+  leftPoints?: string[];
+  leftItems?: string[];
+  rightLabel?: string;
+  rightTitle?: string;
+  rightPoints?: string[];
+  rightItems?: string[];
 };
 
 export type UiCardItem = {
@@ -122,10 +148,49 @@ export type UiCardItem = {
 export type UiCardScene = BaseScene & {
   type: 'ui_card';
   variant?: 'saas' | 'whatsapp';
-  appName: string;
+  appName?: string;
+  title?: string;
+  badge?: string;
   timestamp?: string;
-  headerTitle: string;
-  items: Array<string | UiCardItem>;
+  headerTitle?: string;
+  items?: Array<string | UiCardItem>;
+};
+
+export type WhatsappChatMessage = {
+  sender: 'client' | 'bot';
+  text: string;
+  time?: string;
+};
+
+export type WhatsappChatScene = BaseScene & {
+  type: 'whatsapp_chat';
+  contactName?: string;
+  messages?: WhatsappChatMessage[];
+};
+
+export type BarChartDatum = {
+  label: string;
+  value: number;
+  displayValue?: string;
+  highlight?: boolean;
+};
+
+export type BarChartScene = BaseScene & {
+  type: 'bar_chart';
+  title?: string;
+  bars?: BarChartDatum[];
+};
+
+export type TimelineStepItem = {
+  number: string;
+  title: string;
+  subtitle?: string;
+};
+
+export type TimelineStepsScene = BaseScene & {
+  type: 'timeline_steps';
+  title?: string;
+  steps?: TimelineStepItem[];
 };
 
 export type CtaScene = BaseScene & {
@@ -144,6 +209,9 @@ export type SceneItem =
   | ImageTextScene
   | ComparisonScene
   | UiCardScene
+  | WhatsappChatScene
+  | BarChartScene
+  | TimelineStepsScene
   | CtaScene;
 
 export type SceneConfig = SceneItem;
@@ -153,6 +221,7 @@ export type VideoJob = {
   enabled?: boolean;
   title?: string;
   caption?: string;
+  brandOverride?: Partial<BrandConfig>;
   audio: AudioConfig;
   captions?: CaptionsConfig;
   scenes: SceneItem[];
@@ -163,6 +232,7 @@ export type BatchSettings = {
   width?: number;
   height?: number;
   skipExisting?: boolean;
+  concurrency?: number;
   defaultLanguage?: string;
 };
 
