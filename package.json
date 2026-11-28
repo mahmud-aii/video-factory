@@ -10,6 +10,10 @@
     "render-one": "node scripts/render-one.mjs",
     "factory": "node scripts/night-factory.mjs",
     "plan": "node scripts/plan-matrix.mjs",
+    "preflight:media": "node scripts/media-preflight.mjs",
+    "qa:preflight": "node scripts/qa-preflight.mjs",
+    "qa:stills": "node scripts/qa-preflight.mjs --with-stills",
+    "verify": "npm run qa:preflight",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

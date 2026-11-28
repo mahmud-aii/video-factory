@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+
+  path_filters:
+    - "src/**/*.ts"
+    - "src/**/*.tsx"
+    - "scripts/**/*.mjs"
+    - "scripts/**/*.py"
+    - "clients/**/*.json"
+    - ".github/workflows/*.yml"
+    - "workflows/*.yml"
+    - "remotion.config.ts"
+    - "package.json"
+    - "!output/**"
+    - "!node_modules/**"
+    - "!.remotion/**"
+    - "!.agents/**"
+    - "!package-lock.json"
+    - "!skills-lock.json"
+    - "!**/*.mp4"
+    - "!**/*.mov"
+    - "!**/*.webm"
+    - "!**/*.mkv"
+    - "!**/*.mp3"
+    - "!**/*.wav"
+    - "!**/*.m4a"
+    - "!**/*.ogg"
+    - "!**/*.flac"
+    - "!**/*.png"
+    - "!**/*.jpg"
+    - "!**/*.jpeg"
+    - "!**/*.webp"
+
+  path_instructions:
+    - path: "src/**/*.{ts,tsx}"
+      instructions: |
+        Enforce VideoFactory Remotion v4 & RTL guardrails:
+        1. Flag ANY non-zero `letterSpacing` applied to RTL or unguarded text. Arabic/Dari/Persian/Pashto text MUST lock `letterSpacing: '0px'` and `direction: brand.dir` (non-zero letterSpacing is ONLY valid when explicitly scoped to `direction: 'ltr'`).
+        2. Flag any `<OffthreadVideo>`, `<Img>`, or `<Audio>` referencing client files without first checking `resolvedAssets` (`validVideos`, `validImages`, `hasLogo`, `hasVoice`, `hasBgm`, `hasTransitionSfx`) and providing a clean visual/silent fallback.
+        3. Verify all new scene types are registered in `src/types.ts` (`SceneItem`), normalized in `formatSceneForBidi`, and routed in `src/scenes/SceneRouter.tsx`.
+        4. Ensure mobile 9:16 safe zones (`top >= 220px`, `bottom >= 340px`, `horizontal >= 64px`) and module-scope `@remotion/google-fonts` loading are preserved.
+        5. Flag any hardcoded credentials, API keys, or tokens.
+
+    - path: "clients/**/*.json"
+      instructions: |
+        Validate multi-brand client configurations:
+        1. Flag any backslashes (`\`), absolute paths, or `..` segments in `logoPath`, `voicePath`, `bgmPath`, `transitionSfxPath`, `videoPath`, or `imagePath` (must be relative forward-slash paths under `clients/{slug}/`).
+        2. Check that `scenes` weights in active (`enabled !== false`) `batch.json` jobs sum to `100` for predictable proportional timing, and warn if `demo_001` is accidentally left `"enabled": true` in non-template clients.
+        3. Verify `settings.concurrency` (if present) does NOT exceed `2` to prevent GitHub Actions OOM kills.
+        4. For `clients/khidmatyar/**`, enforce unified spelling `خدمت يار`, gold `#D4AF37` `<= 5%` frame budget, and `noIconRotation: true`.
+
+    - path: "scripts/**/*.{mjs,py}"
+      instructions: |
+        Review cloud automation & preflight scripts:
+        1. Ensure `bundle()` calls always set `publicDir: path.resolve('clients')` matching `remotion.config.ts`.
+        2. Flag `concurrency > 2` in `renderMedia()` (high OOM risk on standard GitHub Actions runners).
+        3. Ensure media preflight and fallback synthesis scripts never overwrite existing Google Drive client assets and never leak secrets (`RCLONE_CONF_BASE64`, `TG_BOT_TOKEN`, `TG_CHAT_ID`).
+
+    - path: "{.github/workflows,workflows}/*.yml"
+      instructions: |
+        Review GitHub Actions cloud render workflows:
+        1. Flag any hardcoded secrets or tokens (`RCLONE_CONF_BASE64`, `TG_BOT_TOKEN`, `TG_CHAT_ID` must only come from `${{ secrets.* }}`).
+        2. Ensure `rclone copy` from Drive excludes `*.json` so Git remains the single source of truth for `brand.json`, `style-rules.json`, and `batch.json`.
+        3. Flag `max-parallel` or Remotion `concurrency > 2` changes that could cause runner OOM crashes.
+
+chat:
+  auto_reply: true

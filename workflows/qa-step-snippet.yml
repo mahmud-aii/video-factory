@@ -1,0 +1,6 @@
+# Optional CI step for .github/workflows/render-factory.yml
+# Paste right after the "Pull client media assets from Google Drive" (rclone copy) step:
+
+      - name: Strict media preflight check
+        if: env.DRIVE_ENABLED == 'true' && env.SKIP_VIDEO != 'true'
+        run: node scripts/media-preflight.mjs "${{ matrix.slug }}" "${{ matrix.videoId }}" --strict

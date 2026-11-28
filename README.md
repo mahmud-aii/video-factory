@@ -42,11 +42,19 @@ video-factory/
 │   ├── night-factory.mjs         # Sequential local/fallback batch runner (bundles once)
 │   ├── transcribe.py             # Standalone Faster-Whisper (small, cpu, int8) word timestamps
 │   ├── ensure-sfx.py             # Procedural fallback ambient BGM & transition whoosh synthesizer (stdlib + ffmpeg)
+│   ├── media-preflight.mjs       # Non-destructive ffprobe/ffmpeg media inspector & loudness normalizer
+│   ├── qa-preflight.mjs          # Pre-render JSON/RTL/TypeScript QA + 3-frame headless still smoke check
 │   └── lib/factory-utils.mjs     # Shared workspace, resolvedAssets (validVideos/validImages/hasTransitionSfx), and captions
+├── docs/
+│   ├── CLOUD_MCP_SETUP.md        # 1-click Antigravity MCP & CodeRabbit setup guide
+│   └── specs/README.md           # Conductor Spec Workflow template
+├── AGENTS.md                     # Autonomous Cloud Agent operating manual & guardrails
+├── .coderabbit.yaml              # Factory-tuned AI PR review configuration
 ├── .github/workflows/
 │   └── render-factory.yml        # Parallel Matrix GitHub Actions pipeline (max-parallel: 5)
 ├── workflows/
-│   └── render-factory.yml        # Backup copy of the workflow file
+│   ├── render-factory.yml        # Backup copy of the workflow file
+│   └── qa-step-snippet.yml       # Optional strict media-preflight CI step snippet
 └── remotion.config.ts            # Remotion v4 config (publicDir: "./clients")
 ```
 
